@@ -1,0 +1,21 @@
+{
+  "name": "pod-ecommerce-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Ready Print-on-Demand (POD) T-Shirt E-Commerce Platform with 2-Side Dashboard System",
+  "scripts": {
+    "dev": "node dev-runner.js",
+    "start": "node dev-runner.js",
+    "seed": "cd backend && npm run seed",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev"
+  },
+  "keywords": [
+    "pod",
+    "print-on-demand",
+    "ecommerce",
+    "dual-dashboard"
+  ],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,65 @@
+import React from 'react';
+import SEO from '../../components/common/SEO';
+
+export default function SizeGuidePage({ isModal = false }) {
+  return (
+    <div className={`space-y-6 ${isModal ? '' : 'max-w-4xl mx-auto px-4 py-12'}`}>
+      {!isModal && <SEO title="Size Guide" />}
+
+      <div className="border-b border-neutral-200 pb-4">
+        <span className="text-xs font-bold text-[#C8A96B] tracking-widest uppercase font-mono">Fit Specifications</span>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#171717] uppercase font-display tracking-tight">Size & Fit Guide</h1>
+      </div>
+
+      <p className="text-xs text-neutral-600">
+        Our apparel features a relaxed, drop-shoulder boxy fit. If you prefer a traditional standard fit, consider sizing down.
+      </p>
+
+      <div className="overflow-x-auto bg-white rounded-2xl border border-neutral-200/80 shadow-sm">
+        <table className="w-full text-left text-xs text-neutral-600 border-collapse">
+          <thead>
+            <tr className="border-b border-neutral-200 bg-neutral-50 font-bold uppercase text-[#171717]">
+              <th className="p-3.5">Size Tag</th>
+              <th className="p-3.5">Chest Width (Inches)</th>
+              <th className="p-3.5">Length (Inches)</th>
+              <th className="p-3.5">Sleeve Length (Inches)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-100 font-mono">
+            <tr>
+              <td className="p-3.5 font-bold text-[#111111]">S</td>
+              <td className="p-3.5">40"</td>
+              <td className="p-3.5">28"</td>
+              <td className="p-3.5">8.5"</td>
+            </tr>
+            <tr>
+              <td className="p-3.5 font-bold text-[#111111]">M</td>
+              <td className="p-3.5">42"</td>
+              <td className="p-3.5">29"</td>
+              <td className="p-3.5">9.0"</td>
+            </tr>
+            <tr>
+              <td className="p-3.5 font-bold text-[#111111]">L</td>
+              <td className="p-3.5">44"</td>
+              <td className="p-3.5">30"</td>
+              <td className="p-3.5">9.5"</td>
+            </tr>
+            <tr>
+              <td className="p-3.5 font-bold text-[#111111]">XL</td>
+              <td className="p-3.5">46"</td>
+              <td className="p-3.5">31"</td>
+              <td className="p-3.5">10.0"</td>
+            </tr>
+            <tr>
+              <td className="p-3.5 font-bold text-[#111111]">XXL</td>
+              <td className="p-3.5">48"</td>
+              <td className="p-3.5">32"</td>
+              <td className="p-3.5">10.5"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
