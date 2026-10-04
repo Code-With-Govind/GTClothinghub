@@ -5,80 +5,74 @@ import { Shirt, Palette, Paintbrush, Flame, Sparkles, ArrowRight } from 'lucide-
 export default function MovingCategoriesMarquee() {
   const categoryItems = [
     {
-      name: 'Regular Plain T-Shirts',
+      name: 'Regular T-Shirts',
       badge: 'Classic Fit',
       icon: Shirt,
-      path: '/shop?mainSection=Regular+T-Shirts&subSection=Plain+T-Shirts',
+      path: '/shop?mainSection=Regular+T-Shirts',
       image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Oversized Graphics',
+      name: 'Oversized Drops',
       badge: 'Heavy 240 GSM',
       icon: Flame,
-      path: '/shop?mainSection=Oversized+T-Shirts&subSection=Printed+T-Shirts',
+      path: '/shop?mainSection=Oversized+T-Shirts',
       image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Custom Printed Canvas',
+      name: 'Fleece Hoodies',
+      badge: 'Winter Comfort',
+      icon: Palette,
+      path: '/shop?search=Hoodie',
+      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      name: 'Custom Prints',
       badge: 'Your Artwork',
       icon: Paintbrush,
       path: '/shop?subSection=Add+Your+Custom+Designs',
       image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
     },
-    {
-      name: 'Oversized Plain Basics',
-      badge: 'Drop Shoulder',
-      icon: Shirt,
-      path: '/shop?mainSection=Oversized+T-Shirts&subSection=Plain+T-Shirts',
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80',
-    },
-    {
-      name: 'Regular Printed Art',
-      badge: 'Vintage Prints',
-      icon: Palette,
-      path: '/shop?mainSection=Regular+T-Shirts&subSection=Printed+T-Shirts',
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80',
-    },
   ];
 
-  const marqueeItems = [...categoryItems, ...categoryItems];
+  // Repeat items for seamless marquee loop
+  const marqueeItems = [...categoryItems, ...categoryItems, ...categoryItems];
 
   return (
-    <div className="w-full space-y-3 py-4 overflow-hidden border-y border-[#E5E0D8] bg-white">
+    <div className="w-full space-y-3 py-4 overflow-hidden border-y border-[#DDD7CB] bg-[#FAF8F3]">
       <div className="flex items-center justify-between px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#111111]" />
-          <span className="text-[10px] font-mono font-bold uppercase text-[#111111] tracking-widest">
-            FEATURED CATEGORIES
+          <Sparkles className="w-3.5 h-3.5 text-[#B89452]" />
+          <span className="text-[10px] font-mono font-bold uppercase text-[#292621] tracking-widest">
+            FEATURED CATEGORIES (4 AT A TIME)
           </span>
         </div>
-        <span className="text-[10px] text-[#737373] font-mono hidden sm:inline-block">
+        <span className="text-[10px] text-[#6F6A61] font-mono hidden sm:inline-block">
           Hover to pause
         </span>
       </div>
 
-      <div className="relative w-full overflow-hidden py-2 bg-[#F7F5F0]">
-        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-4 px-4">
+      <div className="relative w-full max-w-7xl mx-auto overflow-hidden py-2 px-4 sm:px-8">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-4">
           {marqueeItems.map((item, idx) => {
             const Icon = item.icon;
             return (
               <Link
                 key={idx}
                 to={item.path}
-                className="group shrink-0 w-72 h-32 p-4 bg-white border border-[#E5E0D8] hover:border-[#111111] transition-all duration-300 relative overflow-hidden flex flex-col justify-between shadow-fashion-sm"
+                className="group shrink-0 w-[calc((100vw-3rem)/2)] sm:w-[calc((100vw-5rem)/3)] md:w-[285px] lg:w-[292px] h-32 p-4 bg-white border border-[#DDD7CB] hover:border-[#292621] transition-all duration-300 relative overflow-hidden flex flex-col justify-between shadow-fashion-sm"
               >
                 <div className="flex items-center justify-between relative z-10">
                   <span className="fashion-badge-subtle">
                     {item.badge}
                   </span>
-                  <Icon className="w-4 h-4 text-[#111111] group-hover:scale-110 transition-transform" />
+                  <Icon className="w-4 h-4 text-[#292621] group-hover:scale-110 transition-transform" />
                 </div>
 
                 <div className="relative z-10">
-                  <h4 className="font-display font-extrabold text-[#111111] text-sm uppercase leading-tight group-hover:text-[#404040]">
+                  <h4 className="font-display font-extrabold text-[#292621] text-xs sm:text-sm uppercase leading-tight group-hover:text-[#B89452] transition-colors">
                     {item.name}
                   </h4>
-                  <span className="text-[9px] font-bold text-[#737373] uppercase tracking-widest flex items-center gap-1 mt-1 group-hover:text-[#111111]">
+                  <span className="text-[9px] font-bold text-[#6F6A61] uppercase tracking-widest flex items-center gap-1 mt-1 group-hover:text-[#292621]">
                     Explore Drop <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
