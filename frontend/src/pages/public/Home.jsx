@@ -128,13 +128,13 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="h-80 bg-white border border-[#DDD7CB] animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {(newArrivals.length > 0 ? newArrivals : featuredPicks).slice(0, 4).map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
@@ -161,72 +161,72 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Link
             to="/shop?mainSection=Regular+T-Shirts"
-            className="group relative h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=80"
               alt="T-Shirts Category"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-6 flex flex-col justify-end text-white">
-              <span className="text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-4 sm:p-6 flex flex-col justify-end text-white">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
                 CLASSIC SILHOUETTES
               </span>
-              <h3 className="text-xl font-extrabold uppercase font-display text-white">T-SHIRTS</h3>
+              <h3 className="text-base sm:text-xl font-extrabold uppercase font-display text-white">T-SHIRTS</h3>
             </div>
           </Link>
 
           <Link
             to="/shop?mainSection=Oversized+T-Shirts"
-            className="group relative h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&auto=format&fit=crop&q=80"
               alt="Oversized Category"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-6 flex flex-col justify-end text-white">
-              <span className="text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-4 sm:p-6 flex flex-col justify-end text-white">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
                 BOXY 240 GSM DROPS
               </span>
-              <h3 className="text-xl font-extrabold uppercase font-display text-white">OVERSIZED</h3>
+              <h3 className="text-base sm:text-xl font-extrabold uppercase font-display text-white">OVERSIZED</h3>
             </div>
           </Link>
 
           <Link
             to="/shop?search=Hoodie"
-            className="group relative h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80"
               alt="Hoodies Category"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-6 flex flex-col justify-end text-white">
-              <span className="text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-4 sm:p-6 flex flex-col justify-end text-white">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
                 FLEECE COMFORT
               </span>
-              <h3 className="text-xl font-extrabold uppercase font-display text-white">HOODIES</h3>
+              <h3 className="text-base sm:text-xl font-extrabold uppercase font-display text-white">HOODIES</h3>
             </div>
           </Link>
 
           <Link
             to="/shop?isNewArrival=true"
-            className="group relative h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80"
               alt="New Drops Category"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-6 flex flex-col justify-end text-white">
-              <span className="text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#292621]/80 via-[#292621]/20 to-transparent p-4 sm:p-6 flex flex-col justify-end text-white">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold text-[#B89452] uppercase tracking-widest">
                 LIMITED RUNS
               </span>
-              <h3 className="text-xl font-extrabold uppercase font-display text-white">NEW DROPS</h3>
+              <h3 className="text-base sm:text-xl font-extrabold uppercase font-display text-white">NEW DROPS</h3>
             </div>
           </Link>
         </div>
@@ -263,7 +263,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. FEATURED PRODUCTS (FEATURED PICKS) */}
+      {/* 5. FEATURED PRODUCTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex items-end justify-between border-b border-[#DDD7CB] pb-4">
           <div>
@@ -282,7 +282,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {featuredPicks.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
