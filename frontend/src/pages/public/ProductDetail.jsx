@@ -8,12 +8,14 @@ import ProductCard from '../../components/product/ProductCard';
 import SizeGuidePage from './SizeGuidePage';
 import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { formatPrice } from '../../utils/formatters';
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,15 +68,24 @@ export default function ProductDetail() {
   }
 
   const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login', { state: { from: { pathname: `/product/${slug}` } } });
+      return;
+    }
     addToCart(product, selectedColor, selectedSize, quantity);
     setAddedToast(true);
     setTimeout(() => setAddedToast(false), 3000);
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      navigate('/login', { state: { from: { pathname: `/product/${slug}` } } });
+      return;
+    }
     addToCart(product, selectedColor, selectedSize, quantity);
     navigate('/checkout');
   };
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 bg-[#F5F1E8]">

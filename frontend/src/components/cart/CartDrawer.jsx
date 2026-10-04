@@ -2,14 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import CartItem from './CartItem';
 import { formatPrice } from '../../utils/formatters';
 
 export default function CartDrawer() {
   const { cartItems, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartSubtotal } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   if (!isCartOpen) return null;
+
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden animate-fade-in">
@@ -79,12 +82,17 @@ export default function CartDrawer() {
               <button
                 onClick={() => {
                   setIsCartOpen(false);
-                  navigate('/checkout');
+                  if (!user) {
+                    navigate('/login', { state: { from: { pathname: '/checkout' } } });
+                  } else {
+                    navigate('/checkout');
+                  }
                 }}
                 className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2"
               >
                 PROCEED TO CHECKOUT <ArrowRight className="w-4 h-4" />
               </button>
+
 
               <button
                 onClick={() => {

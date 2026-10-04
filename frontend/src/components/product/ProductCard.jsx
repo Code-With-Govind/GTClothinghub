@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight, Star, Eye } from 'lucide-react';
 import { formatPrice } from '../../utils/formatters';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [added, setAdded] = useState(false);
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!user) {
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+
     const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0].name : 'Pitch Black';
     const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'M';
     addToCart(product, defaultColor, defaultSize, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
+
 
   const primaryImage = product.images && product.images.length > 0
     ? product.images[0].url
