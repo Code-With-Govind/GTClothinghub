@@ -3,6 +3,18 @@ const generateToken = require('../utils/generateToken');
 const crypto = require('crypto');
 const emailService = require('../services/email/emailService');
 
+const validateStrongPassword = (password) => {
+  // Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+  const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return strongRegex.test(password);
+};
+
+const validateIndianPhone = (phone) => {
+  if (!phone) return true;
+  const cleanPhone = phone.replace(/[\s\-\+\(\)]/g, '').slice(-10);
+  return /^[6-9]\d{9}$/.test(cleanPhone);
+};
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -14,16 +26,34 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide name, email, and password' });
     }
 
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email.toLowerCase())) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid email address' });
+    }
+
+    if (phone && !validateIndianPhone(phone)) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid 10-digit Indian mobile phone number (starting with 6, 7, 8, or 9)' });
+    }
+
+    if (!validateStrongPassword(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is too weak! Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (e.g. @, #, $, !)',
+      });
+    }
+
     const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       return res.status(400).json({ success: false, message: 'Email address already registered' });
     }
 
+    const cleanPhone = phone ? phone.replace(/[\s\-\+\(\)]/g, '').slice(-10) : '';
+
     const user = await User.create({
       name,
       email: email.toLowerCase(),
       password,
-      phone: phone || '',
+      phone: cleanPhone,
       role: 'CUSTOMER',
     });
 
@@ -44,6 +74,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // @desc    Login user
 // @route   POST /api/auth/login

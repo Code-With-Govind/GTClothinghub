@@ -70,19 +70,20 @@ export default function ProductCard({ product }) {
           </Link>
         </div>
 
-        {/* "Select Options" Glassmorphism Overlay Pill Button at Bottom of Image */}
-        <div className="absolute inset-x-2.5 bottom-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+        {/* "Select Options" Overlay Button at Bottom of Image (Always visible on mobile touch screens) */}
+        <div className="absolute inset-x-2.5 bottom-2.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
           <button
             onClick={handleQuickAdd}
-            className="w-full py-2 bg-white/95 hover:bg-white text-[#292621] text-xs font-bold rounded-xl shadow-md border border-white/50 backdrop-blur-xs transition-all hover:scale-[1.02] flex items-center justify-center gap-1.5"
+            type="button"
+            className="w-full py-2 bg-white/95 hover:bg-white text-[#292621] text-xs font-bold rounded-xl shadow-md border border-white/50 backdrop-blur-xs transition-all hover:scale-[1.02] flex items-center justify-center gap-1.5 touch-manipulation"
           >
-            {added ? 'ADDED TO BAG!' : 'Select Options'}
+            {added ? 'ADDED TO BAG!' : 'ADD TO BAG'}
           </button>
         </div>
       </div>
 
       {/* Product Info */}
-      <div className="p-3 sm:p-4 flex flex-col flex-grow justify-between text-center space-y-1.5 bg-white">
+      <div className="p-3 sm:p-4 flex flex-col flex-grow justify-between text-center space-y-2 bg-white">
         <div>
           <Link to={`/product/${product.slug}`} className="block">
             <h3 className="font-semibold text-xs sm:text-sm text-[#292621] hover:text-[#B89452] transition-colors line-clamp-1 leading-snug font-sans">
@@ -100,9 +101,19 @@ export default function ProductCard({ product }) {
             Rs. {(product.compareAtPrice || product.price * 2)?.toLocaleString('en-IN') || '2,999.00'}
           </span>
         </div>
+
+        {/* Mobile Quick Add Button below price for extra touch convenience */}
+        <button
+          onClick={handleQuickAdd}
+          type="button"
+          className="sm:hidden w-full py-2 bg-[#292621] text-white text-[11px] font-extrabold uppercase rounded-lg shadow-xs active:scale-95 transition-all mt-1"
+        >
+          {added ? 'ADDED!' : 'QUICK ADD TO BAG'}
+        </button>
       </div>
     </div>
   );
 }
+
 
 
