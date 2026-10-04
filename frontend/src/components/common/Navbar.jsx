@@ -34,7 +34,7 @@ export default function Navbar() {
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-[#292621] hover:text-[#B89452] transition-colors"
+                className="p-1.5 sm:p-2 text-[#292621] hover:text-[#B89452] transition-colors"
                 aria-label="Toggle Navigation Menu"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -42,15 +42,15 @@ export default function Navbar() {
             </div>
 
             {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-9 h-9 bg-[#292621] text-white font-brand font-black text-sm flex items-center justify-center tracking-tighter group-hover:bg-[#36322B] transition-colors">
+            <Link to="/" className="flex items-center gap-1.5 sm:gap-3 group shrink-0 max-w-[50%] sm:max-w-none">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#292621] text-white font-brand font-black text-xs sm:text-sm flex items-center justify-center tracking-tighter shrink-0 group-hover:bg-[#36322B] transition-colors">
                 GT
               </div>
-              <div className="flex flex-col">
-                <span className="font-display font-extrabold text-lg tracking-wider text-[#292621] uppercase group-hover:text-[#B89452] transition-colors">
+              <div className="flex flex-col min-w-0">
+                <span className="font-display font-extrabold text-xs xs:text-sm sm:text-base md:text-lg tracking-wider text-[#292621] uppercase group-hover:text-[#B89452] transition-colors whitespace-nowrap truncate">
                   {settings.brandName || 'GT CLOTHING HUB'}
                 </span>
-                <span className="text-[9px] tracking-widest text-[#6F6A61] uppercase font-mono">Modern Apparel</span>
+                <span className="text-[8px] sm:text-[9px] tracking-widest text-[#6F6A61] uppercase font-mono hidden sm:block truncate">Modern Apparel</span>
               </div>
             </Link>
 
@@ -124,12 +124,12 @@ export default function Navbar() {
             </nav>
 
             {/* Right Action Icons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               
               {/* Search Trigger Button */}
               <button
                 onClick={() => setShowSearchModal(true)}
-                className="p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
+                className="p-1.5 sm:p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
                 title="Search Products"
               >
                 <Search className="w-5 h-5" />
@@ -138,12 +138,12 @@ export default function Navbar() {
               {/* Cart Drawer Trigger Button */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
+                className="relative p-1.5 sm:p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
                 title="Shopping Bag"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItemCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#292621] text-white text-[10px] font-bold flex items-center justify-center rounded-none shadow-sm">
+                  <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-4 h-4 bg-[#292621] text-white text-[10px] font-bold flex items-center justify-center rounded-none shadow-sm">
                     {totalItemCount}
                   </span>
                 )}
@@ -154,7 +154,7 @@ export default function Navbar() {
                 <div className="relative group">
                   <Link
                     to={isAdmin ? '/admin' : '/account'}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#FAF8F3] border border-[#DDD7CB] text-[#292621] text-xs font-bold uppercase tracking-wider hover:bg-[#DDD7CB] transition-colors"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#FAF8F3] border border-[#DDD7CB] text-[#292621] text-xs font-bold uppercase tracking-wider hover:bg-[#DDD7CB] transition-colors"
                   >
                     <User className="w-4 h-4 text-[#292621]" />
                     <span className="hidden sm:inline-block max-w-[90px] truncate">{user.name.split(' ')[0]}</span>
@@ -201,9 +201,11 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="px-5 py-2.5 bg-[#292621] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#36322B] transition-colors"
+                  className="p-1.5 sm:px-5 sm:py-2.5 bg-[#FAF8F3] sm:bg-[#292621] border sm:border-none border-[#DDD7CB] text-[#292621] sm:text-white text-xs font-bold uppercase tracking-widest hover:bg-[#36322B] hover:text-white transition-colors flex items-center justify-center"
+                  title="Account Login"
                 >
-                  Account
+                  <User className="w-5 h-5 sm:hidden" />
+                  <span className="hidden sm:inline">Account</span>
                 </Link>
               )}
 
