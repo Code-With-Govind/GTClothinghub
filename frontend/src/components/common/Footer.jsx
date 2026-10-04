@@ -77,8 +77,7 @@ export default function Footer() {
               <li><Link to="/shop" className="hover:text-white transition-colors">All Products</Link></li>
               <li><Link to="/shop?isNewArrival=true" className="hover:text-white transition-colors">New Arrivals</Link></li>
               <li><Link to="/shop?mainSection=Regular+T-Shirts" className="hover:text-white transition-colors">T-Shirts</Link></li>
-              <li><Link to="/shop?mainSection=Oversized+T-Shirts" className="hover:text-white transition-colors">Oversized Drops</Link></li>
-              <li><Link to="/categories" className="hover:text-white transition-colors">Category Overview</Link></li>
+              <li><Link to="/shop?mainSection=Oversized+T-Shirts" className="hover:text-white transition-colors">Oversized</Link></li>
             </ul>
           </div>
 
@@ -89,11 +88,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-xs text-[#A39C8E] font-medium">
               <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-              <li><Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
-              <li><Link to="/return-policy" className="hover:text-white transition-colors">Returns & Refunds</Link></li>
+              <li><Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping</Link></li>
+              <li><Link to="/return-policy" className="hover:text-white transition-colors">Returns</Link></li>
               <li><Link to="/order-tracking" className="hover:text-white transition-colors">Track Order</Link></li>
-              <li><Link to="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
-              <li><Link to="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
@@ -103,30 +100,10 @@ export default function Footer() {
               COMPANY
             </h4>
             <ul className="space-y-2.5 text-xs text-[#A39C8E] font-medium">
-              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">About</Link></li>
               <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
             </ul>
-
-            {/* Email Drop Signup */}
-            <div className="pt-6">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#B89452] block mb-2 font-mono">
-                DON'T MISS THE NEXT DROP
-              </span>
-              <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Your Email..."
-                  className="w-full bg-[#1D1A16] border border-[#36322B] px-3 py-2 text-xs text-white placeholder-[#A39C8E] focus:outline-none focus:border-white"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-white text-[#292621] text-[10px] font-bold uppercase tracking-widest shrink-0 hover:bg-[#FAF8F3] transition-colors"
-                >
-                  Join
-                </button>
-              </form>
-            </div>
           </div>
 
         </div>

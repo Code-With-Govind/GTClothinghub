@@ -271,7 +271,7 @@ export default function Home() {
               HANDPICKED DESIGNS
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#292621] font-display">
-              FEATURED PICKS
+              FEATURED PRODUCTS
             </h2>
           </div>
           <Link
