@@ -213,75 +213,75 @@ export default function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#F5F1E8] border-t border-[#DDD7CB] px-6 pt-4 pb-8 space-y-4 animate-slide-up">
+          <div className="lg:hidden bg-[#FAF8F3] border-t border-[#DDD7CB] px-6 pt-5 pb-8 space-y-4 animate-slide-up shadow-fashion-lg">
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452]"
+              className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
             >
               Home
             </Link>
 
-            <div className="space-y-2 pt-2 border-t border-[#DDD7CB]">
+            <div className="space-y-2.5 pt-3 border-t border-[#DDD7CB]">
               <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
                 Shop Collections
               </span>
               <Link
                 to="/shop"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1.5 text-xs font-semibold text-[#292621] hover:text-[#B89452]"
+                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 All Products
               </Link>
               <Link
                 to="/shop?mainSection=Regular+T-Shirts"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1.5 text-xs font-semibold text-[#292621] hover:text-[#B89452]"
+                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 T-Shirts
               </Link>
               <Link
                 to="/shop?mainSection=Oversized+T-Shirts"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1.5 text-xs font-semibold text-[#292621] hover:text-[#B89452]"
+                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 Oversized
               </Link>
               <Link
                 to="/shop?search=Hoodie"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1.5 text-xs font-semibold text-[#292621] hover:text-[#B89452]"
+                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 Hoodies
               </Link>
-            </div>
-
-            <div className="pt-2 border-t border-[#DDD7CB] space-y-3">
               <Link
                 to="/shop?isNewArrival=true"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452]"
+                className="block pl-3 py-1 text-xs font-bold text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 New Arrivals
               </Link>
+            </div>
+
+            <div className="pt-3 border-t border-[#DDD7CB] space-y-3">
               <Link
                 to="/about"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452]"
+                className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 About
               </Link>
               <Link
                 to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452]"
+                className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
               >
                 Contact
               </Link>
               <Link
                 to="/order-tracking"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-bold uppercase tracking-wider text-[#6F6A61] hover:text-[#292621]"
+                className="block text-xs font-bold uppercase tracking-widest text-[#6F6A61] hover:text-[#292621] transition-colors"
               >
                 Track Order
               </Link>
