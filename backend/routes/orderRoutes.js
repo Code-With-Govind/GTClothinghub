@@ -13,6 +13,7 @@ const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { strictLimiter } = require('../middleware/rateLimiterMiddleware');
 
 router.post('/validate-cart', validateCart);
+router.post('/validate', validateCart);
 router.post('/', optionalAuth, strictLimiter, createOrder);
 router.get('/my-orders', protect, getMyOrders);
 router.post('/track', trackOrder);
