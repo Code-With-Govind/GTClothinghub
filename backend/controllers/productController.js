@@ -134,14 +134,16 @@ exports.createProduct = async (req, res) => {
       sizes: sizes || [],
       variants: variants || [],
       tags: tags || [],
-      isFeatured: flags?.isFeatured || false,
-      isBestSeller: flags?.isBestSeller || false,
-      isNewArrival: flags?.isNewArrival || false,
+      isFeatured: flags?.isFeatured !== undefined ? flags.isFeatured : true,
+      isBestSeller: flags?.isBestSeller !== undefined ? flags.isBestSeller : true,
+      isNewArrival: flags?.isNewArrival !== undefined ? flags.isNewArrival : true,
+      status: 'ACTIVE',
       podProductId: podProductId || '',
       hsnCode: hsnCode || '61091000',
       seoTitle: seoTitle || name,
-      seoDescription: seoDescription || description.substring(0, 160),
+      seoDescription: seoDescription || (description ? description.substring(0, 160) : name),
     });
+
 
     res.status(201).json({ success: true, product });
   } catch (error) {
