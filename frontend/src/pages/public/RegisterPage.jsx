@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Phone, ArrowRight, AlertTriangle } from 'lucide-react';
+import { User, Mail, Lock, Phone, ArrowRight, AlertTriangle, CheckCircle2, ShieldCheck } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import { useAuth } from '../../context/AuthContext';
 
@@ -9,24 +9,56 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  
+  // OTP Verification state
+  const [step, setStep] = useState(1); // 1: Info, 2: Verification
+  const [emailOtp, setEmailOtp] = useState('');
+  const [phoneOtp, setPhoneOtp] = useState('');
+  const [demoEmailOtp, setDemoEmailOtp] = useState('');
+  const [demoPhoneOtp, setDemoPhoneOtp] = useState('');
+  
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
+  const { register, sendEmailOtp, sendPhoneOtp, verifyEmailOtp, verifyPhoneOtp } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleRegisterInitial = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
+
+    if (!name || !email || !password) {
+      setError('Name, email, and password are required.');
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // 1. Create User
       const user = await register(name, email, password, phone);
-      if (user?.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/account');
+      setSuccess('Account created! Verification codes sent.');
+
+      // 2. Trigger Email & Phone OTPs in background
+      try {
+        const eRes = await sendEmailOtp(email);
+        if (eRes.demoOtp) setDemoEmailOtp(eRes.demoOtp);
+      } catch (err) {
+        console.warn('Email OTP trigger note:', err);
       }
+
+      if (phone) {
+        try {
+          const pRes = await sendPhoneOtp(phone);
+          if (pRes.demoOtp) setDemoPhoneOtp(pRes.demoOtp);
+        } catch (err) {
+          console.warn('Phone OTP trigger note:', err);
+        }
+      }
+
+      setStep(2);
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -34,99 +66,195 @@ export default function RegisterPage() {
     }
   };
 
+  const handleVerifyStep = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      if (emailOtp) {
+        await verifyEmailOtp(email, emailOtp);
+      }
+      if (phone && phoneOtp) {
+        await verifyPhoneOtp(phone, phoneOtp);
+      }
+
+      setSuccess('Account verified successfully! Redirecting...');
+      setTimeout(() => {
+        navigate('/account');
+      }, 1200);
+    } catch (err) {
+      setError(err.message || 'Invalid verification OTP code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-md mx-auto px-4 py-16 space-y-8 bg-brand-ivory min-h-[70vh] flex flex-col justify-center">
-      <SEO title="Create Account" />
+    <div className="max-w-md mx-auto px-4 py-12 space-y-6 bg-[#FAF8F3] min-h-[75vh] flex flex-col justify-center">
+      <SEO title="Create Account & Verify" />
 
       <div className="text-center space-y-2">
-        <span className="text-xs font-bold text-brand-gold tracking-widest uppercase font-mono">Join GT Clothing Hub</span>
-        <h1 className="text-3xl font-extrabold text-brand-espresso uppercase font-display tracking-tight">Create Account</h1>
-        <p className="text-xs text-brand-grey">Register to track orders and enjoy streamlined checkout.</p>
+        <span className="text-[10px] font-mono font-bold text-[#B89452] tracking-widest uppercase">Join GT Clothing Hub</span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292621] uppercase font-display tracking-tight">
+          {step === 1 ? 'Create Account' : 'Verify Contact Details'}
+        </h1>
+        <p className="text-xs text-[#6F6A61] font-medium">
+          {step === 1 ? 'Register to track orders and enjoy streamlined checkout.' : 'Enter 6-digit OTP codes to verify email & phone number.'}
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 border border-brand-beige shadow-fashion-sm space-y-5">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#DDD7CB] shadow-fashion-sm space-y-5">
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+          <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" /> {error}
           </div>
         )}
 
-        <div>
-          <label className="block text-xs font-bold text-brand-espresso uppercase mb-1.5 font-mono">Full Name</label>
-          <div className="relative">
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <User className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
+        {success && (
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> {success}
           </div>
-        </div>
+        )}
 
-        <div>
-          <label className="block text-xs font-bold text-brand-espresso uppercase mb-1.5 font-mono">Email Address</label>
-          <div className="relative">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="john@example.com"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <Mail className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
+        {/* Demo OTP Notifications */}
+        {(demoEmailOtp || demoPhoneOtp) && (
+          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl space-y-1 font-mono">
+            {demoEmailOtp && <div>Demo Email OTP: <strong className="text-[#292621]">{demoEmailOtp}</strong></div>}
+            {demoPhoneOtp && <div>Demo Mobile OTP: <strong className="text-[#292621]">{demoPhoneOtp}</strong></div>}
           </div>
-        </div>
+        )}
 
-        <div>
-          <label className="block text-xs font-bold text-brand-espresso uppercase mb-1.5 font-mono">Phone Number</label>
-          <div className="relative">
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <Phone className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
-          </div>
-        </div>
+        {step === 1 ? (
+          <form onSubmit={handleRegisterInitial} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Full Name</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                />
+                <User className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-xs font-bold text-brand-espresso uppercase mb-1.5 font-mono">Password (Min. 6 chars)</label>
-          <div className="relative">
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <Lock className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
-          </div>
-        </div>
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Email Address</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                />
+                <Mail className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-primary w-full py-3.5 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2"
-        >
-          {loading ? 'Creating Account...' : 'Register Account'} <ArrowRight className="w-4 h-4" />
-        </button>
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Mobile Phone Number</label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="9876543210"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all font-mono"
+                />
+                <Phone className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
 
-        <div className="pt-4 border-t border-brand-beige text-center text-xs text-brand-grey">
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Password (Min. 6 chars)</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                />
+                <Lock className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#292621] hover:bg-[#36322B] text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-[#292621]"
+            >
+              {loading ? 'Creating Account...' : 'Register Account'} <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        ) : (
+          /* Step 2: Verification Codes Input */
+          <form onSubmit={handleVerifyStep} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Email Verification OTP Code</label>
+              <input
+                type="text"
+                maxLength={6}
+                value={emailOtp}
+                onChange={(e) => setEmailOtp(e.target.value)}
+                placeholder="6-Digit Email OTP"
+                className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl px-4 py-3 text-center text-sm font-mono font-bold text-[#292621] tracking-widest focus:outline-none focus:border-[#292621]"
+              />
+              <p className="text-[10px] text-[#6F6A61] mt-1 font-mono">Sent to {email}</p>
+            </div>
+
+            {phone && (
+              <div>
+                <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Mobile Phone OTP Code</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOtp(e.target.value)}
+                  placeholder="6-Digit Mobile OTP"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl px-4 py-3 text-center text-sm font-mono font-bold text-[#292621] tracking-widest focus:outline-none focus:border-[#292621]"
+                />
+                <p className="text-[10px] text-[#6F6A61] mt-1 font-mono">Sent to +91 {phone}</p>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => navigate('/account')}
+                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-[#292621] text-xs font-bold uppercase rounded-xl transition-all"
+              >
+                Skip For Now
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 py-3 bg-[#292621] hover:bg-[#36322B] text-white text-xs font-bold uppercase rounded-xl transition-all flex items-center justify-center gap-1"
+              >
+                {loading ? 'Verifying...' : 'Verify Account'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        <div className="pt-4 border-t border-[#DDD7CB] text-center text-xs text-[#6F6A61]">
           Already registered?{' '}
-          <Link to="/login" className="font-bold text-brand-espresso hover:underline">
+          <Link to="/login" className="font-bold text-[#292621] hover:underline">
             Login Here
           </Link>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
+
 

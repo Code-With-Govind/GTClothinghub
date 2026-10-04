@@ -37,6 +37,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isPhoneVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailOtp: String,
+    emailOtpExpire: Date,
+    phoneOtp: String,
+    phoneOtpExpire: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
@@ -44,6 +52,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 
 // Encrypt password using bcrypt before saving
 userSchema.pre('save', async function (next) {

@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Lock, Mail, Phone, ArrowRight, AlertTriangle, CheckCircle2, ShieldCheck } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
+  const [loginMethod, setLoginMethod] = useState('EMAIL'); // 'EMAIL' or 'PHONE'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [demoOtpCode, setDemoOtpCode] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, sendPhoneOtp, verifyPhoneOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/account';
 
-  const handleSubmit = async (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
@@ -29,80 +36,243 @@ export default function LoginPage() {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed. Please check credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendPhoneOtp = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!phone || phone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await sendPhoneOtp(phone);
+      setOtpSent(true);
+      if (res.demoOtp) {
+        setDemoOtpCode(res.demoOtp);
+      }
+      setSuccess(`OTP code sent to +91 ${phone}`);
+    } catch (err) {
+      setError(err.message || 'Failed to send OTP code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!otp || otp.length < 6) {
+      setError('Please enter the 6-digit OTP code');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await verifyPhoneOtp(phone, otp);
+      setSuccess('Mobile number verified! Logging in...');
+      setTimeout(() => {
+        if (res.user?.role === 'ADMIN') {
+          navigate('/admin');
+        } else {
+          navigate(from, { replace: true });
+        }
+      }, 1000);
+    } catch (err) {
+      setError(err.message || 'Invalid OTP code.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16 space-y-8 bg-brand-ivory min-h-[70vh] flex flex-col justify-center">
+    <div className="max-w-md mx-auto px-4 py-12 space-y-6 bg-[#FAF8F3] min-h-[75vh] flex flex-col justify-center">
       <SEO title="Account Login" />
 
       <div className="text-center space-y-2">
-        <span className="text-xs font-bold text-brand-gold tracking-widest uppercase font-mono">Member Access</span>
-        <h1 className="text-3xl font-extrabold text-brand-espresso uppercase font-display tracking-tight">Welcome Back</h1>
-        <p className="text-xs text-brand-grey">Sign in to track your orders and saved preferences.</p>
+        <span className="text-[10px] font-mono font-bold text-[#B89452] tracking-widest uppercase">Member Access</span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292621] uppercase font-display tracking-tight">Welcome Back</h1>
+        <p className="text-xs text-[#6F6A61] font-medium">Sign in to track orders and manage account preferences.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 border border-brand-beige shadow-fashion-sm space-y-5">
+      {/* Login Method Toggle Tabs */}
+      <div className="flex bg-white p-1 rounded-2xl border border-[#DDD7CB] shadow-xs">
+        <button
+          type="button"
+          onClick={() => { setLoginMethod('EMAIL'); setError(''); setSuccess(''); }}
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+            loginMethod === 'EMAIL'
+              ? 'bg-[#292621] text-white shadow-xs'
+              : 'text-[#6F6A61] hover:text-[#292621]'
+          }`}
+        >
+          Email & Password
+        </button>
+        <button
+          type="button"
+          onClick={() => { setLoginMethod('PHONE'); setError(''); setSuccess(''); }}
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+            loginMethod === 'PHONE'
+              ? 'bg-[#292621] text-white shadow-xs'
+              : 'text-[#6F6A61] hover:text-[#292621]'
+          }`}
+        >
+          Mobile OTP Login
+        </button>
+      </div>
+
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#DDD7CB] shadow-fashion-sm space-y-5">
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+          <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" /> {error}
           </div>
         )}
 
-        <div>
-          <label className="block text-xs font-bold text-brand-espresso uppercase mb-1.5 font-mono">Email Address</label>
-          <div className="relative">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="customer@example.com"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <Mail className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
+        {success && (
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> {success}
           </div>
-        </div>
+        )}
 
-        <div>
-          <div className="flex justify-between items-center mb-1.5">
-            <label className="block text-xs font-bold text-brand-espresso uppercase font-mono">Password</label>
-            <Link to="/forgot-password" className="text-[11px] font-semibold text-brand-gold hover:underline font-mono">
-              Forgot?
-            </Link>
+        {/* Demo OTP Banner if present */}
+        {demoOtpCode && (
+          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl text-center font-mono font-bold">
+            Demo Verification OTP Code: <span className="text-base text-[#292621] underline">{demoOtpCode}</span>
           </div>
-          <div className="relative">
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-brand-cream border border-brand-beige pl-10 pr-4 py-3 text-xs text-brand-espresso focus:outline-none focus:border-brand-espresso focus:bg-white transition-all font-sans"
-            />
-            <Lock className="w-4 h-4 text-brand-grey absolute left-3.5 top-3.5" />
+        )}
+
+        {/* Method 1: Email & Password Form */}
+        {loginMethod === 'EMAIL' && (
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Email Address</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="customer@example.com"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                />
+                <Mail className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-xs font-bold text-[#292621] uppercase font-mono">Password</label>
+                <Link to="/forgot-password" className="text-[11px] font-semibold text-[#B89452] hover:underline font-mono">
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                />
+                <Lock className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#292621] hover:bg-[#36322B] text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-[#292621]"
+            >
+              {loading ? 'Authenticating...' : 'Sign In To Account'} <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        )}
+
+        {/* Method 2: Mobile Phone OTP Form */}
+        {loginMethod === 'PHONE' && (
+          <div className="space-y-4">
+            {!otpSent ? (
+              <form onSubmit={handleSendPhoneOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Mobile Phone Number</label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="9876543210"
+                      className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl pl-10 pr-4 py-3 text-xs text-[#292621] focus:outline-none focus:border-[#292621] focus:bg-white transition-all font-mono"
+                    />
+                    <Phone className="w-4 h-4 text-[#6F6A61] absolute left-3.5 top-3.5" />
+                  </div>
+                  <p className="text-[10px] text-[#6F6A61] font-mono mt-1">We will send a 6-digit OTP code for instant login.</p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-[#292621] hover:bg-[#36322B] text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-[#292621]"
+                >
+                  {loading ? 'Sending OTP...' : 'Send Verification OTP'} <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyPhoneOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#292621] uppercase mb-1.5 font-mono">Enter 6-Digit OTP</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    className="w-full bg-[#FAF8F3] border border-[#DDD7CB] rounded-xl px-4 py-3 text-center text-lg font-mono font-bold text-[#292621] tracking-widest focus:outline-none focus:border-[#292621] focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpSent(false); setOtp(''); }}
+                    className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-[#292621] text-xs font-bold uppercase rounded-xl transition-all"
+                  >
+                    Change Phone
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 py-3 bg-[#292621] hover:bg-[#36322B] text-white text-xs font-bold uppercase rounded-xl transition-all flex items-center justify-center gap-1"
+                  >
+                    {loading ? 'Verifying...' : 'Verify & Login'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
-        </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-primary w-full py-3.5 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2"
-        >
-          {loading ? 'Logging in...' : 'Sign In To Account'} <ArrowRight className="w-4 h-4" />
-        </button>
-
-        <div className="pt-4 border-t border-brand-beige text-center text-xs text-brand-grey">
+        <div className="pt-4 border-t border-[#DDD7CB] text-center text-xs text-[#6F6A61]">
           Don't have an account yet?{' '}
-          <Link to="/register" className="font-bold text-brand-espresso hover:underline">
+          <Link to="/register" className="font-bold text-[#292621] hover:underline">
             Register Here
           </Link>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
+
 

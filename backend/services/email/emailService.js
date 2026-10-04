@@ -95,6 +95,22 @@ class EmailService {
     `;
     return this.sendEmail({ to: email, subject, html });
   }
+
+  async sendVerificationOtp(email, otp) {
+    const subject = `Your GT Clothing Hub Verification Code: ${otp}`;
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; background-color: #FAF8F3;">
+        <h2 style="color: #292621; font-size: 22px;">Verify Your Email Address</h2>
+        <p style="color: #6F6A61; font-size: 14px;">Use the 6-digit code below to complete your email verification on GT CLOTHING HUB:</p>
+        <div style="background-color: #292621; color: #ffffff; font-size: 28px; font-weight: bold; letter-spacing: 6px; padding: 16px; text-align: center; border-radius: 8px; margin: 20px 0;">
+          ${otp}
+        </div>
+        <p style="color: #6F6A61; font-size: 12px;">This OTP is valid for 10 minutes. Do not share this code with anyone.</p>
+      </div>
+    `;
+    return this.sendEmail({ to: email, subject, html });
+  }
 }
 
 module.exports = new EmailService();
+

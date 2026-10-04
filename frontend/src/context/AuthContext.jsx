@@ -51,6 +51,33 @@ export const AuthProvider = ({ children }) => {
     return res.user;
   };
 
+  const sendEmailOtp = async (email) => {
+    return await api.post('/auth/send-email-otp', { email });
+  };
+
+  const verifyEmailOtp = async (email, otp) => {
+    const res = await api.post('/auth/verify-email-otp', { email, otp });
+    if (res.user) {
+      setUser((prev) => ({ ...prev, ...res.user }));
+    }
+    return res;
+  };
+
+  const sendPhoneOtp = async (phone) => {
+    return await api.post('/auth/send-phone-otp', { phone });
+  };
+
+  const verifyPhoneOtp = async (phone, otp) => {
+    const res = await api.post('/auth/verify-phone-otp', { phone, otp });
+    if (res.token) {
+      localStorage.setItem('token', res.token);
+    }
+    if (res.user) {
+      setUser(res.user);
+    }
+    return res;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -61,6 +88,10 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         updateProfile,
+        sendEmailOtp,
+        verifyEmailOtp,
+        sendPhoneOtp,
+        verifyPhoneOtp,
       }}
     >
       {children}
@@ -69,3 +100,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+

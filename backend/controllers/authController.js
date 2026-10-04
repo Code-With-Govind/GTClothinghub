@@ -209,3 +209,176 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Send Email Verification OTP
+// @route   POST /api/auth/send-email-otp
+// @access  Public / Private
+exports.sendEmailOtp = async (req, res) => {
+  try {
+    const email = req.body.email || req.user?.email;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Please provide email address' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'No user registered with this email' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.emailOtp = otp;
+    user.emailOtpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+    await user.save();
+
+    await emailService.sendVerificationOtp(user.email, otp);
+
+    res.json({
+      success: true,
+      message: `Verification code sent to ${user.email}`,
+      demoOtp: process.env.NODE_ENV === 'production' ? undefined : otp,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Verify Email OTP
+// @route   POST /api/auth/verify-email-otp
+// @access  Public / Private
+exports.verifyEmailOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const userEmail = email || req.user?.email;
+
+    if (!userEmail || !otp) {
+      return res.status(400).json({ success: false, message: 'Email and 6-digit OTP are required' });
+    }
+
+    const user = await User.findOne({ email: userEmail.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.emailOtp || user.emailOtp !== otp.trim()) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP code' });
+    }
+
+    if (user.emailOtpExpire < Date.now()) {
+      return res.status(400).json({ success: false, message: 'OTP code has expired. Please request a new code.' });
+    }
+
+    user.isEmailVerified = true;
+    user.emailOtp = undefined;
+    user.emailOtpExpire = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Email address verified successfully!',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        isEmailVerified: true,
+        isPhoneVerified: user.isPhoneVerified,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Send Phone Verification OTP
+// @route   POST /api/auth/send-phone-otp
+// @access  Public / Private
+exports.sendPhoneOtp = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const userPhone = phone || req.user?.phone;
+
+    if (!userPhone) {
+      return res.status(400).json({ success: false, message: 'Mobile phone number is required' });
+    }
+
+    let user = req.user ? await User.findById(req.user._id) : await User.findOne({ phone: userPhone });
+
+    if (!user && req.body.email) {
+      user = await User.findOne({ email: req.body.email.toLowerCase() });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    if (user) {
+      user.phone = userPhone;
+      user.phoneOtp = otp;
+      user.phoneOtpExpire = Date.now() + 10 * 60 * 1000;
+      await user.save();
+    }
+
+    console.log(`\n--- [PHONE OTP SMS SIMULATION] ---`);
+    console.log(`Phone: ${userPhone}`);
+    console.log(`OTP Code: ${otp}`);
+    console.log(`---------------------------------\n`);
+
+    res.json({
+      success: true,
+      message: `OTP sent to mobile number ${userPhone}`,
+      demoOtp: otp,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Verify Phone OTP
+// @route   POST /api/auth/verify-phone-otp
+// @access  Public / Private
+exports.verifyPhoneOtp = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    const userPhone = phone || req.user?.phone;
+
+    if (!userPhone || !otp) {
+      return res.status(400).json({ success: false, message: 'Phone number and OTP code are required' });
+    }
+
+    const user = req.user ? await User.findById(req.user._id) : await User.findOne({ phone: userPhone });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User with this phone number not found' });
+    }
+
+    if (!user.phoneOtp || user.phoneOtp !== otp.trim()) {
+      return res.status(400).json({ success: false, message: 'Invalid mobile OTP code' });
+    }
+
+    if (user.phoneOtpExpire < Date.now()) {
+      return res.status(400).json({ success: false, message: 'Mobile OTP has expired. Please resend.' });
+    }
+
+    user.isPhoneVerified = true;
+    user.phoneOtp = undefined;
+    user.phoneOtpExpire = undefined;
+    await user.save();
+
+    const token = generateToken(user._id);
+
+    res.json({
+      success: true,
+      message: 'Mobile phone number verified successfully!',
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        isEmailVerified: user.isEmailVerified,
+        isPhoneVerified: true,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
