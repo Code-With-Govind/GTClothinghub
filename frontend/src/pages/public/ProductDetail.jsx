@@ -202,6 +202,26 @@ export default function ProductDetail() {
                 Added {quantity} × {product.name} ({selectedSize}) to bag!
               </div>
             )}
+
+            {/* Genuine Trust Elements */}
+            <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] text-[#6F6A61] font-mono border-t border-[#DDD7CB]">
+              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
+                <span className="font-bold text-[#292621]">Secure Payment</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
+                <span className="font-bold text-[#292621]">240 GSM Cotton</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
+                <Truck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
+                <span className="font-bold text-[#292621]">Pan-India Shipping</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
+                <RefreshCw className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
+                <span className="font-bold text-[#292621]">7-Day Exchange</span>
+              </div>
+            </div>
           </div>
 
           {/* Product Specifications & Details */}
