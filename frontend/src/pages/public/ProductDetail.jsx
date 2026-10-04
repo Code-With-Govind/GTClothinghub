@@ -284,6 +284,22 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
+
+      {/* Sticky Mobile Purchase Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-[#DDD7CB] flex gap-2 shadow-fashion-hover">
+        <button
+          onClick={handleAddToCart}
+          className="btn-outline flex-1 py-3 text-[11px] font-extrabold tracking-widest"
+        >
+          ADD TO CART
+        </button>
+        <button
+          onClick={handleBuyNow}
+          className="btn-primary flex-1 py-3 text-[11px] font-extrabold tracking-widest"
+        >
+          BUY NOW
+        </button>
+      </div>
     </div>
   );
 }
