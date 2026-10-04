@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Truck, RefreshCw, Lock, Sparkles, CheckCircle2 } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import ProductCard from '../../components/product/ProductCard';
+import ProductCarousel from '../../components/product/ProductCarousel';
 import MovingCategoriesMarquee from '../../components/common/MovingCategoriesMarquee';
 import api from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
@@ -18,8 +19,8 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [newRes, featRes, catRes] = await Promise.all([
-          api.get('/products?isNewArrival=true&limit=4'),
-          api.get('/products?isFeatured=true&limit=4'),
+          api.get('/products?isNewArrival=true&limit=8'),
+          api.get('/products?isFeatured=true&limit=8'),
           api.get('/categories'),
         ]);
         setNewArrivals(newRes.products || []);
@@ -108,37 +109,20 @@ export default function Home() {
       {/* Interactive Category Marquee */}
       <MovingCategoriesMarquee />
 
-      {/* 2. NEW ARRIVALS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex items-end justify-between border-b border-[#DDD7CB] pb-4">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
-              JUST DROPPED
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#292621] font-display">
-              NEW ARRIVALS
-            </h2>
-          </div>
-          <Link
-            to="/shop?isNewArrival=true"
-            className="text-xs font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452] flex items-center gap-1 transition-colors"
-          >
-            VIEW ALL <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
+      {/* 2. NEW ARRIVALS CAROUSEL */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-80 bg-white border border-[#DDD7CB] animate-pulse" />
+              <div key={i} className="h-80 bg-white border border-[#DDD7CB] animate-pulse rounded-2xl" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {(newArrivals.length > 0 ? newArrivals : featuredPicks).slice(0, 4).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          <ProductCarousel
+            products={newArrivals.length > 0 ? newArrivals : featuredPicks}
+            title="NEW ARRIVALS"
+            subtitle="JUST DROPPED"
+          />
         )}
       </section>
 
@@ -164,7 +148,7 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Link
             to="/shop?mainSection=Regular+T-Shirts"
-            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] rounded-2xl overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=80"
@@ -181,7 +165,7 @@ export default function Home() {
 
           <Link
             to="/shop?mainSection=Oversized+T-Shirts"
-            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] rounded-2xl overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&auto=format&fit=crop&q=80"
@@ -198,7 +182,7 @@ export default function Home() {
 
           <Link
             to="/shop?search=Hoodie"
-            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] rounded-2xl overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80"
@@ -215,7 +199,7 @@ export default function Home() {
 
           <Link
             to="/shop?isNewArrival=true"
-            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] overflow-hidden shadow-fashion-sm transition-all"
+            className="group relative h-64 sm:h-80 bg-white border border-[#DDD7CB] hover:border-[#292621] rounded-2xl overflow-hidden shadow-fashion-sm transition-all"
           >
             <img
               src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80"
@@ -253,7 +237,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 relative aspect-square bg-white border border-[#DDD7CB] shadow-fashion-md overflow-hidden">
+          <div className="lg:col-span-5 relative aspect-square bg-white border border-[#DDD7CB] shadow-fashion-md overflow-hidden rounded-2xl">
             <img
               src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80"
               alt="Brand Identity Print"
@@ -263,31 +247,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. FEATURED PRODUCTS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex items-end justify-between border-b border-[#DDD7CB] pb-4">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
-              HANDPICKED DESIGNS
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#292621] font-display">
-              FEATURED PRODUCTS
-            </h2>
-          </div>
-          <Link
-            to="/shop"
-            className="text-xs font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452] flex items-center gap-1 transition-colors"
-          >
-            SHOP CATALOG <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {featuredPicks.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
+      {/* 5. FEATURED PRODUCTS CAROUSEL */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        <ProductCarousel
+          products={featuredPicks.length > 0 ? featuredPicks : newArrivals}
+          title="FEATURED PRODUCTS"
+          subtitle="HANDPICKED DESIGNS"
+        />
       </section>
+
 
       {/* 6. WHY CHOOSE US */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
