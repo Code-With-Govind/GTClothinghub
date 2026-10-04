@@ -173,18 +173,18 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-brand-ivory">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F5F1E8]">
       <SEO title="Secure Checkout | GT CLOTHING HUB" />
 
-      <div className="border-b border-brand-beige pb-6 flex items-center justify-between">
+      <div className="border-b border-[#DDD7CB] pb-6 flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-mono font-bold text-brand-grey uppercase tracking-widest block">
+          <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
             CHECKOUT STEP
           </span>
-          <h1 className="text-3xl font-extrabold uppercase text-brand-espresso font-display">COMPLETE YOUR ORDER</h1>
+          <h1 className="text-3xl font-extrabold uppercase text-[#292621] font-display">COMPLETE YOUR ORDER</h1>
         </div>
-        <div className="flex items-center gap-2 text-xs font-bold text-brand-espresso bg-white border border-brand-beige px-3.5 py-1.5 font-mono shadow-fashion-sm">
-          <ShieldCheck className="w-4 h-4 text-brand-gold" /> 256-BIT SSL ENCRYPTED
+        <div className="flex items-center gap-2 text-xs font-bold text-[#292621] bg-white border border-[#DDD7CB] px-3.5 py-1.5 font-mono shadow-fashion-sm">
+          <ShieldCheck className="w-4 h-4 text-[#B89452]" /> 256-BIT SSL ENCRYPTED
         </div>
       </div>
 
@@ -197,10 +197,10 @@ export default function CheckoutPage() {
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left: Address & Payment Method */}
-        <div className="lg:col-span-2 space-y-8 bg-white border border-brand-beige p-6 sm:p-8 shadow-fashion-sm">
+        <div className="lg:col-span-2 space-y-8 bg-white border border-[#DDD7CB] p-6 sm:p-8 shadow-fashion-sm">
           <AddressForm address={shippingAddress} onChange={handleAddressChange} />
           
-          <div className="pt-6 border-t border-brand-beige">
+          <div className="pt-6 border-t border-[#DDD7CB]">
             <PaymentSelector
               paymentMethod={paymentMethod}
               onSelectMethod={setPaymentMethod}

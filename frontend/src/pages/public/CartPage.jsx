@@ -11,15 +11,15 @@ export default function CartPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-brand-ivory">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F5F1E8]">
       <SEO title="Shopping Bag | GT CLOTHING HUB" />
 
-      <div className="flex items-center justify-between border-b border-brand-beige pb-6">
+      <div className="flex items-center justify-between border-b border-[#DDD7CB] pb-6">
         <div>
-          <span className="text-[10px] font-mono font-bold text-brand-grey uppercase tracking-widest block">
+          <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
             YOUR SELECTION
           </span>
-          <h1 className="text-3xl font-extrabold text-brand-espresso uppercase font-display">
+          <h1 className="text-3xl font-extrabold text-[#292621] uppercase font-display">
             SHOPPING BAG
           </h1>
         </div>
@@ -35,15 +35,15 @@ export default function CartPage() {
       </div>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-brand-beige space-y-4 shadow-fashion-sm">
-          <ShoppingBag className="w-12 h-12 text-brand-grey mx-auto" />
-          <h2 className="text-lg font-bold text-brand-espresso uppercase tracking-wider">Your shopping bag is empty</h2>
-          <p className="text-xs text-brand-grey">Discover our latest drop collections and select your preferred items.</p>
+        <div className="text-center py-20 bg-white border border-[#DDD7CB] space-y-4 shadow-fashion-sm">
+          <ShoppingBag className="w-12 h-12 text-[#6F6A61] mx-auto" />
+          <h2 className="text-lg font-bold text-[#292621] uppercase tracking-wider">Your shopping bag is empty</h2>
+          <p className="text-xs text-[#6F6A61]">Discover our latest drop collections and select your preferred items.</p>
           <Link
             to="/shop"
             className="btn-primary inline-block"
           >
-            EXPLORE DROPS CATALOG
+            EXPLORE CATALOG
           </Link>
         </div>
       ) : (
@@ -62,15 +62,15 @@ export default function CartPage() {
           </div>
 
           {/* Checkout Card */}
-          <div className="bg-white border border-brand-beige p-6 space-y-6 h-fit shadow-fashion-sm">
-            <h3 className="font-extrabold text-xs text-brand-espresso uppercase tracking-widest font-display">
+          <div className="bg-white border border-[#DDD7CB] p-6 space-y-6 h-fit shadow-fashion-sm">
+            <h3 className="font-extrabold text-xs text-[#292621] uppercase tracking-widest font-display">
               ORDER SUMMARY
             </h3>
 
-            <div className="space-y-3 text-xs text-brand-grey border-b border-brand-beige pb-4">
+            <div className="space-y-3 text-xs text-[#6F6A61] border-b border-[#DDD7CB] pb-4">
               <div className="flex justify-between">
                 <span>Items Subtotal</span>
-                <span className="font-bold text-brand-espresso">{formatPrice(cartSubtotal)}</span>
+                <span className="font-bold text-[#292621]">{formatPrice(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between font-mono text-[11px]">
                 <span>Shipping</span>
@@ -82,9 +82,9 @@ export default function CartPage() {
               </div>
             </div>
 
-            <div className="flex justify-between items-baseline text-xs font-bold text-brand-espresso uppercase tracking-wider">
+            <div className="flex justify-between items-baseline text-xs font-bold text-[#292621] uppercase tracking-wider">
               <span>ESTIMATED TOTAL</span>
-              <span className="text-2xl font-extrabold text-brand-espresso font-display">{formatPrice(cartSubtotal)}</span>
+              <span className="text-2xl font-extrabold text-[#292621] font-display">{formatPrice(cartSubtotal)}</span>
             </div>
 
             <button
