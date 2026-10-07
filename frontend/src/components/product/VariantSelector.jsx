@@ -17,8 +17,8 @@ export default function VariantSelector({
       {colors.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#6F6A61] font-mono">
-              COLOR: <span className="text-[#292621] font-extrabold">{selectedColor}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#666666] font-mono">
+              COLOR: <span className="text-[#111111] font-extrabold">{selectedColor}</span>
             </span>
           </div>
 
@@ -30,15 +30,15 @@ export default function VariantSelector({
                   key={idx}
                   type="button"
                   onClick={() => onSelectColor(colorObj.name)}
-                  className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[42px] border text-xs font-bold uppercase tracking-wider transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[42px] border rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
                     isSelected
-                      ? 'border-[#292621] bg-[#292621] text-white'
-                      : 'border-[#DDD7CB] bg-white text-[#292621] hover:border-[#292621]'
+                      ? 'border-[#111111] bg-[#111111] text-white'
+                      : 'border-[#E5E2DC] bg-white text-[#111111] hover:border-[#111111]'
                   }`}
                 >
                   <span
-                    className="w-4 h-4 border border-black/20 flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: colorObj.hex || '#121212' }}
+                    className="w-4 h-4 rounded-full border border-black/20 flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: colorObj.hex || '#111111' }}
                   >
                     {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                   </span>
@@ -54,17 +54,17 @@ export default function VariantSelector({
       {sizes.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#6F6A61] font-mono">
-              SIZE: <span className="text-[#292621] font-extrabold">{selectedSize}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#666666] font-mono">
+              SIZE: <span className="text-[#111111] font-extrabold">{selectedSize}</span>
             </span>
 
             {onOpenSizeGuide && (
               <button
                 type="button"
                 onClick={onOpenSizeGuide}
-                className="text-xs font-bold text-[#292621] hover:text-[#B89452] underline uppercase tracking-wider font-mono"
+                className="text-xs font-bold text-[#111111] hover:text-[#6F7358] underline uppercase tracking-wider font-mono"
               >
-                Size Guide
+                SIZE GUIDE
               </button>
             )}
           </div>
@@ -77,10 +77,10 @@ export default function VariantSelector({
                   key={sz}
                   type="button"
                   onClick={() => onSelectSize(sz)}
-                  className={`py-3 min-h-[44px] border text-xs font-extrabold uppercase tracking-widest transition-all ${
+                  className={`py-3 min-h-[46px] border rounded-lg text-xs font-extrabold uppercase tracking-widest transition-all ${
                     isSelected
-                      ? 'border-[#292621] bg-[#292621] text-white'
-                      : 'border-[#DDD7CB] bg-white text-[#292621] hover:border-[#292621]'
+                      ? 'border-[#111111] bg-[#111111] text-white'
+                      : 'border-[#E5E2DC] bg-white text-[#111111] hover:border-[#111111]'
                   }`}
                 >
                   {sz}

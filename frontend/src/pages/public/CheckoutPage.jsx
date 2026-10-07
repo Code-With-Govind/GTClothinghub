@@ -173,23 +173,23 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F5F1E8]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F7F5F0]">
       <SEO title="Secure Checkout | GT CLOTHING HUB" />
 
-      <div className="border-b border-[#DDD7CB] pb-6 flex items-center justify-between">
+      <div className="border-b border-[#E5E2DC] pb-6 flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
+          <span className="text-[11px] font-mono font-bold text-[#666666] uppercase tracking-widest block">
             CHECKOUT STEP
           </span>
-          <h1 className="text-3xl font-extrabold uppercase text-[#292621] font-display">COMPLETE YOUR ORDER</h1>
+          <h1 className="text-3xl font-extrabold uppercase text-[#111111] font-display">COMPLETE YOUR ORDER</h1>
         </div>
-        <div className="flex items-center gap-2 text-xs font-bold text-[#292621] bg-white border border-[#DDD7CB] px-3.5 py-1.5 font-mono shadow-fashion-sm">
-          <ShieldCheck className="w-4 h-4 text-[#B89452]" /> 256-BIT SSL ENCRYPTED
+        <div className="flex items-center gap-2 text-xs font-bold text-[#111111] bg-white border border-[#E5E2DC] px-3.5 py-1.5 font-mono shadow-xs">
+          <ShieldCheck className="w-4 h-4 text-[#6F7358]" /> 256-BIT SSL ENCRYPTED
         </div>
       </div>
 
       {errorMessage && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2">
+        <div className="p-4 bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2 rounded-lg">
           <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" /> {errorMessage}
         </div>
       )}
@@ -197,10 +197,10 @@ export default function CheckoutPage() {
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left: Address & Payment Method */}
-        <div className="lg:col-span-2 space-y-8 bg-white border border-[#DDD7CB] p-6 sm:p-8 shadow-fashion-sm">
+        <div className="lg:col-span-2 space-y-8 bg-white border border-[#E5E2DC] p-6 sm:p-8 rounded-2xl shadow-xs">
           <AddressForm address={shippingAddress} onChange={handleAddressChange} />
           
-          <div className="pt-6 border-t border-[#DDD7CB]">
+          <div className="pt-6 border-t border-[#E5E2DC]">
             <PaymentSelector
               paymentMethod={paymentMethod}
               onSelectMethod={setPaymentMethod}
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={submitting || loadingCart}
-            className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest"
+            className="btn-primary w-full py-4 text-xs font-bold tracking-widest uppercase"
           >
             {submitting ? 'PROCESSING ORDER...' : `PLACE ORDER (${paymentMethod === 'COD' ? 'CASH ON DELIVERY' : 'ONLINE PAYMENT'})`}
           </button>
@@ -233,4 +233,6 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+
 

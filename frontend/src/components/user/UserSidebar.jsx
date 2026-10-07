@@ -26,17 +26,17 @@ export default function UserSidebar() {
   ];
 
   return (
-    <aside className="w-full lg:w-64 bg-white rounded-2xl p-6 border border-neutral-200/80 shadow-sm shrink-0 space-y-6 self-start">
+    <aside className="w-full lg:w-64 bg-white rounded-2xl p-6 border border-[#E5E2DC] shadow-xs shrink-0 space-y-6 self-start">
       {/* User Header Profile */}
-      <div className="flex items-center gap-3 pb-5 border-b border-neutral-100">
+      <div className="flex items-center gap-3 pb-5 border-b border-[#E5E2DC]">
         <div className="w-11 h-11 bg-[#111111] text-white font-bold text-base flex items-center justify-center rounded-xl font-display uppercase">
           {user?.name ? user.name.charAt(0) : 'U'}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-[#171717] text-sm truncate">{user?.name || 'Customer'}</h3>
-          <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
+          <h3 className="font-bold text-[#111111] text-sm truncate">{user?.name || 'Customer'}</h3>
+          <p className="text-xs text-[#666666] truncate">{user?.email}</p>
           {isAdmin && (
-            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[9px] font-bold bg-[#C8A96B]/10 text-[#C8A96B] border border-[#C8A96B]/30 rounded uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[9px] font-bold bg-[#6F7358]/10 text-[#6F7358] border border-[#6F7358]/30 rounded uppercase tracking-wider">
               <Shield className="w-3 h-3" /> Admin Staff
             </span>
           )}
@@ -45,16 +45,16 @@ export default function UserSidebar() {
 
       {/* DUAL DASHBOARD SWITCHER (If Admin) */}
       {isAdmin && (
-        <div className="p-4 bg-neutral-900 text-white rounded-xl space-y-2">
-          <div className="flex items-center gap-1.5 text-[#C8A96B] font-bold text-[11px] uppercase tracking-wider">
+        <div className="p-4 bg-[#111111] text-white rounded-xl space-y-2">
+          <div className="flex items-center gap-1.5 text-[#6F7358] font-bold text-[11px] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" /> Admin Portal
           </div>
-          <p className="text-xs text-neutral-400 leading-snug">
+          <p className="text-xs text-[#E5E2DC] leading-snug">
             Access store management, products & order fulfillment.
           </p>
           <Link
             to="/admin"
-            className="w-full mt-2 py-2.5 px-3 bg-[#C8A96B] hover:bg-[#b59557] text-white text-xs font-bold uppercase rounded-lg transition-all flex items-center justify-between group"
+            className="w-full mt-2 py-2.5 px-3 bg-white text-[#111111] hover:bg-[#F7F5F0] text-xs font-bold uppercase rounded-lg transition-all flex items-center justify-between group font-mono"
           >
             <span>Admin Dashboard</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -64,7 +64,7 @@ export default function UserSidebar() {
 
       {/* Account Nav Items */}
       <nav className="space-y-1">
-        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest px-3 block mb-2 font-mono">
+        <span className="text-[10px] font-bold text-[#666666] uppercase tracking-widest px-3 block mb-2 font-mono">
           Account Menu
         </span>
         {navItems.map((item) => {
@@ -76,11 +76,11 @@ export default function UserSidebar() {
               to={item.path}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? 'bg-[#111111] text-white font-semibold shadow-sm'
-                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-[#171717]'
+                  ? 'bg-[#111111] text-white font-semibold shadow-xs'
+                  : 'text-[#666666] hover:bg-[#F7F5F0] hover:text-[#111111]'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-400'}`} />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#666666]'}`} />
               {item.label}
             </Link>
           );
@@ -88,7 +88,7 @@ export default function UserSidebar() {
       </nav>
 
       {/* Logout Action */}
-      <div className="pt-4 border-t border-neutral-100">
+      <div className="pt-4 border-t border-[#E5E2DC]">
         <button
           onClick={logout}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
@@ -99,4 +99,5 @@ export default function UserSidebar() {
     </aside>
   );
 }
+
 

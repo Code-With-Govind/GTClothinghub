@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, Search, User, Menu, X, ChevronDown, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -13,7 +13,22 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -26,15 +41,27 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#F5F1E8]/95 backdrop-blur-md border-b border-[#DDD7CB] transition-all">
+      {/* Section 09: Announcement Bar */}
+      <div className="w-full bg-[#111111] text-[#F7F5F0] h-[32px] flex items-center justify-center text-[11px] sm:text-[12px] font-mono font-medium uppercase tracking-widest px-4 border-b border-[#222222] select-none z-50">
+        <span>FREE SHIPPING ON ELIGIBLE ORDERS • NEW DROPS EVERY MONTH</span>
+      </div>
+
+      {/* Section 06: Minimalist Navbar */}
+      <header
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+          scrolled
+            ? 'bg-[#F7F5F0]/95 backdrop-blur-md border-b border-[#E5E2DC] shadow-fashion-sm'
+            : 'bg-[#F7F5F0] border-b border-[#E5E2DC]'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-[72px]">
             
             {/* Mobile Menu Toggle Button */}
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1.5 sm:p-2 text-[#292621] hover:text-[#B89452] transition-colors"
+                className="p-2 text-[#111111] hover:text-[#6F7358] transition-colors"
                 aria-label="Toggle Navigation Menu"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -42,22 +69,24 @@ export default function Navbar() {
             </div>
 
             {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-1.5 sm:gap-3 group shrink-0 max-w-[50%] sm:max-w-none">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#292621] text-white font-brand font-black text-xs sm:text-sm flex items-center justify-center tracking-tighter shrink-0 group-hover:bg-[#36322B] transition-colors">
+            <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="w-8 h-8 bg-[#111111] text-white font-mono font-black text-xs flex items-center justify-center tracking-tighter shrink-0 rounded-md group-hover:bg-[#222222] transition-colors">
                 GT
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="font-display font-extrabold text-xs xs:text-sm sm:text-base md:text-lg tracking-wider text-[#292621] uppercase group-hover:text-[#B89452] transition-colors whitespace-nowrap truncate">
-                  {settings.brandName || 'GT CLOTHING HUB'}
-                </span>
-                <span className="text-[8px] sm:text-[9px] tracking-widest text-[#6F6A61] uppercase font-mono hidden sm:block truncate">Modern Apparel</span>
-              </div>
+              <span className="font-display font-extrabold text-base sm:text-lg md:text-xl tracking-wider text-[#111111] uppercase group-hover:text-[#6F7358] transition-colors whitespace-nowrap">
+                {settings.brandName || 'GT CLOTHING HUB'}
+              </span>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8 text-xs font-bold uppercase tracking-widest text-[#292621]">
-              <Link to="/" className="hover:text-[#B89452] transition-colors py-2">
-                Home
+            <nav className="hidden lg:flex items-center space-x-8 text-xs font-bold uppercase tracking-widest text-[#111111]">
+              <Link
+                to="/"
+                className={`hover:text-[#6F7358] transition-colors py-2 ${
+                  location.pathname === '/' ? 'text-[#6F7358] underline underline-offset-4 decoration-2' : ''
+                }`}
+              >
+                HOME
               </Link>
 
               {/* Shop Dropdown */}
@@ -68,121 +97,131 @@ export default function Navbar() {
               >
                 <Link
                   to="/shop"
-                  className="flex items-center gap-1 hover:text-[#B89452] transition-colors"
+                  className={`flex items-center gap-1 hover:text-[#6F7358] transition-colors ${
+                    location.pathname === '/shop' ? 'text-[#6F7358]' : ''
+                  }`}
                 >
-                  Shop <ChevronDown className="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
+                  SHOP <ChevronDown className="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
                 </Link>
 
                 {shopDropdownOpen && (
-                  <div className="absolute left-0 top-full w-56 py-3 bg-white border border-[#DDD7CB] shadow-fashion-lg z-50 animate-fade-in">
-                    <div className="px-4 py-1 text-[9px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest border-b border-[#DDD7CB] mb-1">
-                      Browse Collections
+                  <div className="absolute left-0 top-full w-56 py-3 bg-white border border-[#E5E2DC] rounded-xl shadow-fashion-lg z-50 animate-fade-in">
+                    <div className="px-4 py-1 text-[9px] font-mono font-bold text-[#666666] uppercase tracking-widest border-b border-[#E5E2DC] mb-1">
+                      Browse Catalog
                     </div>
                     <Link
                       to="/shop"
-                      className="block px-4 py-2.5 text-xs font-semibold text-[#292621] hover:bg-[#FAF8F3] hover:text-[#B89452] transition-colors"
+                      className="block px-4 py-2.5 text-xs font-semibold text-[#111111] hover:bg-[#F7F5F0] hover:text-[#6F7358] transition-colors"
                     >
                       All Products
                     </Link>
                     <Link
                       to="/shop?mainSection=Regular+T-Shirts"
-                      className="block px-4 py-2.5 text-xs font-semibold text-[#292621] hover:bg-[#FAF8F3] hover:text-[#B89452] transition-colors"
+                      className="block px-4 py-2.5 text-xs font-semibold text-[#111111] hover:bg-[#F7F5F0] hover:text-[#6F7358] transition-colors"
                     >
-                      T-Shirts
+                      Regular T-Shirts
                     </Link>
                     <Link
                       to="/shop?mainSection=Oversized+T-Shirts"
-                      className="block px-4 py-2.5 text-xs font-semibold text-[#292621] hover:bg-[#FAF8F3] hover:text-[#B89452] transition-colors"
+                      className="block px-4 py-2.5 text-xs font-semibold text-[#111111] hover:bg-[#F7F5F0] hover:text-[#6F7358] transition-colors"
                     >
-                      Oversized
+                      Oversized Tees
                     </Link>
                     <Link
                       to="/shop?search=Hoodie"
-                      className="block px-4 py-2.5 text-xs font-semibold text-[#292621] hover:bg-[#FAF8F3] hover:text-[#B89452] transition-colors"
+                      className="block px-4 py-2.5 text-xs font-semibold text-[#111111] hover:bg-[#F7F5F0] hover:text-[#6F7358] transition-colors"
                     >
-                      Hoodies
+                      Heavy Hoodies
                     </Link>
                     <Link
                       to="/shop?isNewArrival=true"
-                      className="block px-4 py-2.5 text-xs font-semibold text-[#292621] hover:bg-[#FAF8F3] hover:text-[#B89452] transition-colors border-t border-[#DDD7CB] mt-1 pt-2 font-bold"
+                      className="block px-4 py-2.5 text-xs font-semibold text-[#111111] hover:bg-[#F7F5F0] hover:text-[#6F7358] transition-colors border-t border-[#E5E2DC] mt-1 pt-2 font-bold"
                     >
-                      New Arrivals
+                      New Drops
                     </Link>
                   </div>
                 )}
               </div>
 
-              <Link to="/shop?isNewArrival=true" className="hover:text-[#B89452] transition-colors py-2">
-                New Arrivals
+              <Link
+                to="/categories"
+                className={`hover:text-[#6F7358] transition-colors py-2 ${
+                  location.pathname === '/categories' ? 'text-[#6F7358]' : ''
+                }`}
+              >
+                COLLECTIONS
               </Link>
-              <Link to="/about" className="hover:text-[#B89452] transition-colors py-2">
-                About
-              </Link>
-              <Link to="/contact" className="hover:text-[#B89452] transition-colors py-2">
-                Contact
+
+              <Link
+                to="/about"
+                className={`hover:text-[#6F7358] transition-colors py-2 ${
+                  location.pathname === '/about' ? 'text-[#6F7358]' : ''
+                }`}
+              >
+                ABOUT
               </Link>
             </nav>
 
             {/* Right Action Icons */}
-            <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-4">
               
-              {/* Search Trigger Button */}
+              {/* Search Icon */}
               <button
                 onClick={() => setShowSearchModal(true)}
-                className="p-1.5 sm:p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
+                className="p-2 text-[#111111] hover:text-[#6F7358] transition-colors"
                 title="Search Products"
               >
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Cart Drawer Trigger Button */}
+              {/* Cart Bag Icon */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-1.5 sm:p-2.5 text-[#292621] hover:text-[#B89452] hover:bg-[#FAF8F3] transition-colors"
+                className="relative p-2 text-[#111111] hover:text-[#6F7358] transition-colors"
                 title="Shopping Bag"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItemCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-4 h-4 bg-[#292621] text-white text-[10px] font-bold flex items-center justify-center rounded-none shadow-sm">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#111111] text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-sm font-mono">
                     {totalItemCount}
                   </span>
                 )}
               </button>
 
-              {/* Account / User Menu */}
+              {/* User Account / Auth Menu */}
               {user ? (
                 <div className="relative group">
                   <Link
                     to={isAdmin ? '/admin' : '/account'}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#FAF8F3] border border-[#DDD7CB] text-[#292621] text-xs font-bold uppercase tracking-wider hover:bg-[#DDD7CB] transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E2DC] text-[#111111] text-xs font-bold uppercase tracking-wider hover:border-[#111111] transition-colors rounded-lg"
                   >
-                    <User className="w-4 h-4 text-[#292621]" />
+                    <User className="w-4 h-4 text-[#111111]" />
                     <span className="hidden sm:inline-block max-w-[90px] truncate">{user.name.split(' ')[0]}</span>
                     {isAdmin && (
-                      <span className="px-1.5 py-0.5 text-[9px] font-black bg-[#292621] text-white uppercase">
+                      <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#6F7358] text-white uppercase rounded-xs">
                         Admin
                       </span>
                     )}
                   </Link>
 
-                  {/* Dropdown for User Account */}
-                  <div className="absolute right-0 mt-1 w-52 py-2 bg-white border border-[#DDD7CB] shadow-fashion-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 divide-y divide-[#DDD7CB]">
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 mt-1 w-52 py-2 bg-white border border-[#E5E2DC] rounded-xl shadow-fashion-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 divide-y divide-[#E5E2DC]">
                     <div className="py-1">
                       {isAdmin ? (
                         <>
-                          <Link to="/admin" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#292621] hover:bg-[#FAF8F3]">
-                            <Shield className="w-4 h-4 text-[#292621]" /> Admin Dashboard
+                          <Link to="/admin" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#111111] hover:bg-[#F7F5F0]">
+                            <Shield className="w-4 h-4 text-[#111111]" /> Admin Dashboard
                           </Link>
-                          <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#6F6A61] hover:bg-[#FAF8F3] hover:text-[#292621]">
+                          <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#666666] hover:bg-[#F7F5F0] hover:text-[#111111]">
                             <User className="w-4 h-4" /> Customer Profile
                           </Link>
                         </>
                       ) : (
                         <>
-                          <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#292621] hover:bg-[#FAF8F3]">
+                          <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#111111] hover:bg-[#F7F5F0]">
                             <User className="w-4 h-4" /> My Account
                           </Link>
-                          <Link to="/account/orders" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#292621] hover:bg-[#FAF8F3]">
+                          <Link to="/account/orders" className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#111111] hover:bg-[#F7F5F0]">
                             <ShoppingBag className="w-4 h-4" /> My Orders
                           </Link>
                         </>
@@ -201,11 +240,11 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="p-1.5 sm:px-5 sm:py-2.5 bg-[#FAF8F3] sm:bg-[#292621] border sm:border-none border-[#DDD7CB] text-[#292621] sm:text-white text-xs font-bold uppercase tracking-widest hover:bg-[#36322B] hover:text-white transition-colors flex items-center justify-center"
-                  title="Account Login"
+                  className="px-4 py-2 bg-[#111111] text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-[#222222] transition-colors flex items-center gap-1.5"
+                  title="Account Access"
                 >
-                  <User className="w-5 h-5 sm:hidden" />
-                  <span className="hidden sm:inline">Account</span>
+                  <User className="w-4 h-4 sm:hidden" />
+                  <span className="hidden sm:inline">ACCOUNT</span>
                 </Link>
               )}
 
@@ -213,102 +252,80 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Section 07: Mobile Navigation Panel */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#FAF8F3] border-t border-[#DDD7CB] px-6 pt-5 pb-8 space-y-4 animate-slide-up shadow-fashion-lg">
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
-            >
-              Home
-            </Link>
-
-            <div className="space-y-2.5 pt-3 border-t border-[#DDD7CB]">
-              <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
-                Shop Collections
-              </span>
+          <div className="lg:hidden bg-[#F7F5F0] border-t border-[#E5E2DC] px-6 pt-6 pb-8 space-y-5 animate-slide-up shadow-fashion-lg">
+            <nav className="space-y-4">
+              <Link
+                to="/"
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
+              >
+                HOME
+              </Link>
               <Link
                 to="/shop"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
               >
-                All Products
+                SHOP
               </Link>
               <Link
-                to="/shop?mainSection=Regular+T-Shirts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
+                to="/categories"
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
               >
-                T-Shirts
+                COLLECTIONS
               </Link>
-              <Link
-                to="/shop?mainSection=Oversized+T-Shirts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
-              >
-                Oversized
-              </Link>
-              <Link
-                to="/shop?search=Hoodie"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1 text-xs font-semibold text-[#292621] hover:text-[#B89452] transition-colors"
-              >
-                Hoodies
-              </Link>
-              <Link
-                to="/shop?isNewArrival=true"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block pl-3 py-1 text-xs font-bold text-[#292621] hover:text-[#B89452] transition-colors"
-              >
-                New Arrivals
-              </Link>
-            </div>
-
-            <div className="pt-3 border-t border-[#DDD7CB] space-y-3">
               <Link
                 to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
               >
-                About
+                ABOUT
               </Link>
               <Link
                 to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-bold uppercase tracking-widest text-[#292621] hover:text-[#B89452] transition-colors"
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
               >
-                Contact
+                CONTACT
               </Link>
               <Link
-                to="/order-tracking"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs font-bold uppercase tracking-widest text-[#6F6A61] hover:text-[#292621] transition-colors"
+                to={user ? '/account' : '/login'}
+                className="block text-sm font-bold uppercase tracking-widest text-[#111111] hover:text-[#6F7358]"
               >
-                Track Order
+                ACCOUNT
               </Link>
+            </nav>
+
+            <div className="pt-4 border-t border-[#E5E2DC] space-y-2">
+              <span className="text-[10px] font-mono font-bold text-[#666666] uppercase tracking-widest block">
+                Quick Category Filters
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-[#111111]">
+                <Link to="/shop?mainSection=Regular+T-Shirts" className="p-2 bg-white border border-[#E5E2DC] rounded-md text-center">Regular Tees</Link>
+                <Link to="/shop?mainSection=Oversized+T-Shirts" className="p-2 bg-white border border-[#E5E2DC] rounded-md text-center">Oversized Tees</Link>
+                <Link to="/shop?search=Hoodie" className="p-2 bg-white border border-[#E5E2DC] rounded-md text-center">Hoodies</Link>
+                <Link to="/shop?isNewArrival=true" className="p-2 bg-white border border-[#E5E2DC] rounded-md text-center">New Arrivals</Link>
+              </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Search Modal */}
+      {/* Full-width Clean Search Interface */}
       {showSearchModal && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="w-full max-w-xl bg-[#FAF8F3] border border-[#DDD7CB] shadow-fashion-lg p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="w-full max-w-xl bg-[#F7F5F0] border border-[#E5E2DC] rounded-2xl shadow-fashion-lg p-6 relative">
             <button
               onClick={() => setShowSearchModal(false)}
-              className="absolute top-4 right-4 text-[#6F6A61] hover:text-[#292621]"
+              className="absolute top-4 right-4 p-1 text-[#666666] hover:text-[#111111]"
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-sm font-bold text-[#292621] uppercase tracking-widest mb-4 font-display">
-              Search Products
+            <h3 className="text-xs font-bold text-[#111111] uppercase tracking-widest mb-4 font-display">
+              SEARCH PRODUCT CATALOG
             </h3>
             <form onSubmit={handleSearchSubmit} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Search tees, oversized drops, styles..."
+                placeholder="Search tees, oversized drops, hoodies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="fashion-input flex-1"
@@ -318,7 +335,7 @@ export default function Navbar() {
                 type="submit"
                 className="btn-primary shrink-0"
               >
-                Search
+                SEARCH
               </button>
             </form>
           </div>

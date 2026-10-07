@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Shirt, Palette, Paintbrush } from 'lucide-react';
+import { ArrowRight, Shirt, Palette, Paintbrush } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import MovingCategoriesMarquee from '../../components/common/MovingCategoriesMarquee';
 
@@ -10,7 +10,6 @@ export default function Categories() {
       mainTitle: 'Regular T-Shirts',
       badge: 'Classic Fit',
       description: 'Timeless tailored silhouette, 180 GSM super combed cotton, lightweight & versatile everyday wear.',
-      bgGradient: 'from-blue-900/40 via-brand-950 to-brand-900',
       subSections: [
         {
           name: 'Plain T-Shirts',
@@ -27,7 +26,7 @@ export default function Categories() {
           path: '/shop?mainSection=Regular+T-Shirts&subSection=Printed+T-Shirts',
         },
         {
-          name: 'Add Your Custom Designs',
+          name: 'Custom Artwork Canvas',
           icon: Paintbrush,
           tagline: 'Custom POD print canvas',
           image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80',
@@ -39,7 +38,6 @@ export default function Categories() {
       mainTitle: 'Oversized T-Shirts',
       badge: 'Heavyweight Boxy Drop',
       description: '240 GSM heavy cotton streetwear drop shoulder boxy tees. Ultimate comfort & urban aesthetics.',
-      bgGradient: 'from-accent/20 via-brand-950 to-brand-900',
       subSections: [
         {
           name: 'Plain T-Shirts',
@@ -56,7 +54,7 @@ export default function Categories() {
           path: '/shop?mainSection=Oversized+T-Shirts&subSection=Printed+T-Shirts',
         },
         {
-          name: 'Add Your Custom Designs',
+          name: 'Custom Artwork Canvas',
           icon: Paintbrush,
           tagline: 'Custom oversized streetwear canvas',
           image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80',
@@ -67,14 +65,14 @@ export default function Categories() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 bg-[#F7F5F0]">
       <SEO title="Explore T-Shirt Sections & Sub-Sections" />
 
       {/* Page Header */}
-      <div className="border-b border-white/10 pb-6">
-        <span className="text-xs font-bold text-accent tracking-widest uppercase font-mono">Catalog Architecture</span>
-        <h1 className="text-3xl font-black text-white uppercase font-display">T-Shirt Sections & Styles</h1>
-        <p className="text-xs text-slate-400 mt-1">Explore Regular T-Shirts and Oversized T-Shirts by Plain, Printed, or Custom Design types.</p>
+      <div className="border-b border-[#E5E2DC] pb-6">
+        <span className="text-xs font-bold text-[#6F7358] tracking-widest uppercase font-mono">Catalog Architecture</span>
+        <h1 className="text-3xl font-extrabold text-[#111111] uppercase font-display">T-Shirt Sections & Styles</h1>
+        <p className="text-xs text-[#666666] mt-1">Explore Regular T-Shirts and Oversized T-Shirts by Plain, Printed, or Custom Design types.</p>
       </div>
 
       {/* Moving Category Marquee Slider */}
@@ -82,22 +80,22 @@ export default function Categories() {
 
       {/* Main Sections Grid */}
       {sections.map((sec, idx) => (
-        <div key={idx} className={`glass-card rounded-3xl p-8 border border-white/10 space-y-8 bg-gradient-to-r ${sec.bgGradient}`}>
+        <div key={idx} className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E2DC] space-y-8 shadow-xs">
           {/* Main Section Title Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E2DC] pb-6">
             <div>
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-accent text-white rounded-md">
+                <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-[#6F7358] text-white rounded-md font-mono">
                   {sec.badge}
                 </span>
-                <h2 className="text-3xl font-black text-white uppercase font-display">{sec.mainTitle}</h2>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111111] uppercase font-display">{sec.mainTitle}</h2>
               </div>
-              <p className="text-xs text-slate-300 mt-2 max-w-2xl">{sec.description}</p>
+              <p className="text-xs text-[#666666] mt-2 max-w-2xl">{sec.description}</p>
             </div>
 
             <Link
               to={`/shop?mainSection=${encodeURIComponent(sec.mainTitle)}`}
-              className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold uppercase rounded-xl border border-white/10 flex items-center justify-center gap-2 self-start md:self-auto transition-all"
+              className="btn-primary self-start md:self-auto py-2.5 px-5 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
             >
               <span>Explore All {sec.mainTitle}</span>
               <ArrowRight className="w-4 h-4" />
@@ -112,24 +110,24 @@ export default function Categories() {
                 <Link
                   key={sIdx}
                   to={sub.path}
-                  className="group glass-card rounded-2xl overflow-hidden border border-white/10 hover:border-accent/50 transition-all flex flex-col h-72 relative"
+                  className="group bg-[#F7F5F0] rounded-xl overflow-hidden border border-[#E5E2DC] hover:border-[#111111] transition-all flex flex-col h-72 relative shadow-xs"
                 >
                   <img
                     src={sub.image}
                     alt={sub.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 flex flex-col justify-end space-y-2">
-                    <div className="flex items-center gap-2 text-accent">
-                      <Icon className="w-4 h-4" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest font-mono">Sub Section</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/90 via-[#111111]/40 to-transparent p-6 flex flex-col justify-end space-y-1.5">
+                    <div className="flex items-center gap-2 text-[#F7F5F0]">
+                      <Icon className="w-4 h-4 text-[#6F7358]" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#F7F5F0]">Sub Section</span>
                     </div>
-                    <h3 className="text-xl font-black text-white uppercase font-display group-hover:text-accent transition-colors">
+                    <h3 className="text-lg font-bold text-white uppercase font-display group-hover:text-[#F7F5F0] transition-colors">
                       {sub.name}
                     </h3>
-                    <p className="text-xs text-slate-300">{sub.tagline}</p>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-accent uppercase tracking-wider pt-2 group-hover:translate-x-1 transition-transform">
-                      Shop Now <ArrowRight className="w-4 h-4" />
+                    <p className="text-xs text-[#E5E2DC] line-clamp-1">{sub.tagline}</p>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-white uppercase tracking-wider pt-2 group-hover:translate-x-1 transition-transform">
+                      Shop Now <ArrowRight className="w-4 h-4 text-[#6F7358]" />
                     </span>
                   </div>
                 </Link>
@@ -141,3 +139,4 @@ export default function Categories() {
     </div>
   );
 }
+

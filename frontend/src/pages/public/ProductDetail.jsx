@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ShieldCheck, Truck, RefreshCw, Star, ArrowLeft, Zap } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Truck, RefreshCw, Star, ArrowLeft, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import VariantSelector from '../../components/product/VariantSelector';
 import ReviewSection from '../../components/product/ReviewSection';
@@ -25,6 +25,13 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
+
+  // Section 25: Accordion state
+  const [openAccordion, setOpenAccordion] = useState('DESCRIPTION');
+
+  const toggleAccordion = (name) => {
+    setOpenAccordion(openAccordion === name ? null : name);
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -86,79 +93,95 @@ export default function ProductDetail() {
     navigate('/checkout');
   };
 
+  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+  const discountPercent = hasDiscount
+    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+    : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 bg-[#F5F1E8]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 bg-[#F7F5F0]">
       <SEO title={product.seoTitle || `${product.name} | GT CLOTHING HUB`} description={product.seoDescription || product.description} />
 
-      <Link to="/shop" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#6F6A61] hover:text-[#292621] transition-colors font-mono">
-        <ArrowLeft className="w-4 h-4" /> Back to Catalog
+      <Link to="/shop" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#666666] hover:text-[#111111] transition-colors font-mono">
+        <ArrowLeft className="w-4 h-4" /> CATALOG
       </Link>
 
-      {/* Main Product PDP Layout */}
+      {/* Main Product Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
-        {/* LEFT: Multi-Image Gallery */}
+        {/* LEFT: Section 20 - Product Gallery */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="aspect-[4/5] bg-white border border-[#DDD7CB] relative overflow-hidden shadow-fashion-sm">
+          <div className="aspect-[4/5] bg-white border border-[#E5E2DC] rounded-2xl relative overflow-hidden shadow-fashion-sm">
             <img
               src={activeImage}
               alt={product.name}
               className="w-full h-full object-cover object-center"
             />
+            {discountPercent && (
+              <div className="absolute top-4 left-4">
+                <span className="bg-[#111111] text-white font-mono font-bold text-xs px-2.5 py-1 rounded-md">
+                  -{discountPercent}% OFF
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Thumbnails list */}
+          {/* Thumbnails (Front, Back, Detail Views) */}
           {product.images && product.images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img.url)}
-                  className={`w-24 aspect-[4/5] border transition-all shrink-0 bg-white ${
-                    activeImage === img.url ? 'border-[#292621] ring-1 ring-[#292621]' : 'border-[#DDD7CB] opacity-70 hover:opacity-100'
+                  className={`w-24 aspect-[4/5] border rounded-lg transition-all shrink-0 bg-white overflow-hidden ${
+                    activeImage === img.url ? 'border-[#111111] ring-2 ring-[#111111]' : 'border-[#E5E2DC] opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  <img src={img.url} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* RIGHT: Product Information & Purchase Form */}
-        <div className="lg:col-span-5 space-y-8 bg-white border border-[#DDD7CB] p-6 sm:p-8 shadow-fashion-sm">
+        {/* RIGHT: Section 21 - Product Information */}
+        <div className="lg:col-span-5 space-y-8 bg-white border border-[#E5E2DC] rounded-2xl p-6 sm:p-8 shadow-fashion-sm">
           <div>
-            <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block mb-1">
-              {product.mainSection || 'Streetwear'} • {product.subSection || 'Drop'}
+            <span className="text-[10px] font-mono font-bold text-[#6F7358] uppercase tracking-widest block mb-1">
+              {product.mainSection || 'GT STREETWEAR'} • {product.subSection || 'ORIGINAL DROP'}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#292621] font-display leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#111111] font-display leading-tight">
               {product.name}
             </h1>
 
-            {/* Rating if available */}
+            {/* Rating if real */}
             {product.numReviews > 0 && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-[#B89452]">
+              <div className="flex items-center gap-2 mt-2 text-xs text-[#6F7358]">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    <Star key={i} className="w-3.5 h-3.5 fill-current text-[#111111]" />
                   ))}
                 </div>
-                <span className="font-bold text-[#292621] text-xs">{product.averageRating?.toFixed(1)}</span>
-                <span className="text-[#6F6A61] text-[11px]">({product.numReviews} reviews)</span>
+                <span className="font-bold text-[#111111] text-xs font-mono">{product.averageRating?.toFixed(1)}</span>
+                <span className="text-[#666666] text-[11px]">({product.numReviews} reviews)</span>
               </div>
             )}
           </div>
 
-          {/* Price */}
-          <div className="flex items-baseline gap-3 border-y border-[#DDD7CB] py-4">
-            <span className="text-3xl font-extrabold text-[#292621] font-display">{formatPrice(product.price)}</span>
-            {product.compareAtPrice > product.price && (
-              <span className="text-sm text-[#6F6A61] line-through font-mono">{formatPrice(product.compareAtPrice)}</span>
+          {/* Section 22: Product Price Design */}
+          <div className="flex items-baseline gap-3 border-y border-[#E5E2DC] py-4">
+            <span className="text-3xl font-extrabold text-[#111111] font-mono">{formatPrice(product.price)}</span>
+            {hasDiscount && (
+              <>
+                <span className="text-base text-[#666666] line-through font-mono">{formatPrice(product.compareAtPrice)}</span>
+                <span className="text-xs font-bold text-[#6F7358] bg-[#F7F5F0] border border-[#E5E2DC] px-2 py-0.5 rounded-md font-mono">
+                  {discountPercent}% OFF
+                </span>
+              </>
             )}
           </div>
 
-          {/* Variant Selector */}
+          {/* Section 23: Size Selector */}
           <VariantSelector
             colors={product.colors}
             sizes={product.sizes}
@@ -169,23 +192,23 @@ export default function ProductDetail() {
             onOpenSizeGuide={() => setShowSizeGuide(true)}
           />
 
-          {/* Quantity & Prominent Action CTAs */}
-          <div className="space-y-4 pt-4 border-t border-[#DDD7CB]">
+          {/* Quantity & Section 26: CTAs */}
+          <div className="space-y-4 pt-4 border-t border-[#E5E2DC]">
             <div className="flex items-center gap-4">
-              <span className="text-xs font-bold text-[#6F6A61] uppercase tracking-widest font-mono">QUANTITY:</span>
-              <div className="flex items-center border border-[#DDD7CB] bg-white">
+              <span className="text-xs font-bold text-[#666666] uppercase tracking-widest font-mono">QUANTITY:</span>
+              <div className="flex items-center border border-[#E5E2DC] bg-white rounded-lg overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3.5 py-1.5 text-[#292621] font-bold hover:bg-[#FAF8F3]"
+                  className="px-3.5 py-1.5 text-[#111111] font-bold hover:bg-[#F7F5F0]"
                 >
                   -
                 </button>
-                <span className="px-4 text-xs font-extrabold text-[#292621]">{quantity}</span>
+                <span className="px-4 text-xs font-extrabold text-[#111111] font-mono">{quantity}</span>
                 <button
                   type="button"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3.5 py-1.5 text-[#292621] font-bold hover:bg-[#FAF8F3]"
+                  className="px-3.5 py-1.5 text-[#111111] font-bold hover:bg-[#F7F5F0]"
                 >
                   +
                 </button>
@@ -195,102 +218,139 @@ export default function ProductDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
-                className="btn-outline w-full py-4 text-xs font-extrabold tracking-widest"
+                className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest"
               >
                 <ShoppingBag className="w-4 h-4" /> ADD TO CART
               </button>
 
               <button
                 onClick={handleBuyNow}
-                className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest"
+                className="btn-outline w-full py-4 text-xs font-extrabold tracking-widest"
               >
-                <Zap className="w-4 h-4 fill-current" /> BUY NOW
+                <Zap className="w-4 h-4" /> BUY NOW
               </button>
             </div>
 
             {addedToast && (
-              <div className="p-3 bg-[#FAF8F3] border border-[#DDD7CB] text-[#292621] text-xs font-bold text-center uppercase tracking-wider animate-fade-in">
+              <div className="p-3 bg-[#111111] text-white text-xs font-bold text-center uppercase tracking-wider rounded-lg animate-fade-in">
                 Added {quantity} × {product.name} ({selectedSize}) to bag!
               </div>
             )}
-
-            {/* Genuine Trust Elements */}
-            <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] text-[#6F6A61] font-mono border-t border-[#DDD7CB]">
-              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
-                <span className="font-bold text-[#292621]">Secure Payment</span>
-              </div>
-              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
-                <span className="font-bold text-[#292621]">240 GSM Cotton</span>
-              </div>
-              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
-                <Truck className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
-                <span className="font-bold text-[#292621]">Pan-India Shipping</span>
-              </div>
-              <div className="flex items-center gap-1.5 p-2 bg-[#FAF8F3] border border-[#DDD7CB]">
-                <RefreshCw className="w-3.5 h-3.5 text-[#B89452] shrink-0" />
-                <span className="font-bold text-[#292621]">7-Day Exchange</span>
-              </div>
-            </div>
           </div>
 
-          {/* Product Specifications & Details */}
-          <div className="space-y-3 pt-6 border-t border-[#DDD7CB]">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#292621] font-display">
-              PRODUCT DETAILS & SPECIFICATIONS
-            </h3>
-            <p className="text-xs text-[#6F6A61] leading-relaxed font-sans">{product.description}</p>
-
-            <div className="grid grid-cols-1 gap-2 pt-2 text-xs font-medium text-[#292621]">
-              <div className="p-3 bg-[#FAF8F3] border border-[#DDD7CB] flex items-center justify-between">
-                <span className="text-[#6F6A61] uppercase text-[10px] font-mono">Fabric Weight</span>
-                <span className="font-bold">240 GSM Combed Cotton</span>
-              </div>
-              <div className="p-3 bg-[#FAF8F3] border border-[#DDD7CB] flex items-center justify-between">
-                <span className="text-[#6F6A61] uppercase text-[10px] font-mono">Fit Profile</span>
-                <span className="font-bold">{product.mainSection || 'Streetwear Fit'}</span>
-              </div>
-              <div className="p-3 bg-[#FAF8F3] border border-[#DDD7CB] flex items-center justify-between">
-                <span className="text-[#6F6A61] uppercase text-[10px] font-mono">Print Standard</span>
-                <span className="font-bold">High-Density Direct-To-Garment</span>
-              </div>
+          {/* Section 25: Product Information Accordion */}
+          <div className="pt-6 border-t border-[#E5E2DC] space-y-2">
+            
+            {/* Accordion 1: DESCRIPTION */}
+            <div className="border-b border-[#E5E2DC] pb-3">
+              <button
+                onClick={() => toggleAccordion('DESCRIPTION')}
+                className="w-full flex justify-between items-center py-2 text-xs font-bold uppercase tracking-widest text-[#111111] font-display"
+              >
+                <span>DESCRIPTION</span>
+                {openAccordion === 'DESCRIPTION' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {openAccordion === 'DESCRIPTION' && (
+                <div className="pt-2 text-xs text-[#666666] leading-relaxed font-sans animate-fade-in">
+                  {product.description}
+                </div>
+              )}
             </div>
 
-            {/* Shipping & Returns Details */}
-            <div className="space-y-3 pt-6 border-t border-[#DDD7CB]">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-[#292621] font-display flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#292621]" /> SHIPPING & RETURNS
-              </h3>
-              <div className="space-y-2 text-xs text-[#6F6A61]">
-                <p><strong className="text-[#292621]">Pan-India Shipping:</strong> Dispatched within 3-5 business days. Free shipping on orders over ₹999.</p>
-                <p><strong className="text-[#292621]">Return Policy:</strong> 7-day easy exchange/return policy for damaged or defective items.</p>
-              </div>
+            {/* Accordion 2: SIZE & FIT */}
+            <div className="border-b border-[#E5E2DC] pb-3">
+              <button
+                onClick={() => toggleAccordion('SIZE_FIT')}
+                className="w-full flex justify-between items-center py-2 text-xs font-bold uppercase tracking-widest text-[#111111] font-display"
+              >
+                <span>SIZE & FIT</span>
+                {openAccordion === 'SIZE_FIT' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {openAccordion === 'SIZE_FIT' && (
+                <div className="pt-2 text-xs text-[#666666] space-y-1.5 font-sans animate-fade-in">
+                  <p>• Fit: {product.mainSection || 'Streetwear Boxy Silhouette'}</p>
+                  <p>• Model fit: True to size. Choose one size up for an exaggerated oversized fit.</p>
+                  <p>• Pre-shrunk to ensure consistent sizing after washing.</p>
+                </div>
+              )}
             </div>
+
+            {/* Accordion 3: MATERIAL & CARE */}
+            <div className="border-b border-[#E5E2DC] pb-3">
+              <button
+                onClick={() => toggleAccordion('MATERIAL_CARE')}
+                className="w-full flex justify-between items-center py-2 text-xs font-bold uppercase tracking-widest text-[#111111] font-display"
+              >
+                <span>MATERIAL & CARE</span>
+                {openAccordion === 'MATERIAL_CARE' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {openAccordion === 'MATERIAL_CARE' && (
+                <div className="pt-2 text-xs text-[#666666] space-y-1.5 font-sans animate-fade-in">
+                  <p>• Fabric: 100% Super Combed Heavyweight Cotton (240 GSM)</p>
+                  <p>• Wash Care: Machine wash cold inside out with like colors.</p>
+                  <p>• Do not iron directly over printed artwork.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Accordion 4: SHIPPING */}
+            <div className="border-b border-[#E5E2DC] pb-3">
+              <button
+                onClick={() => toggleAccordion('SHIPPING')}
+                className="w-full flex justify-between items-center py-2 text-xs font-bold uppercase tracking-widest text-[#111111] font-display"
+              >
+                <span>SHIPPING</span>
+                {openAccordion === 'SHIPPING' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {openAccordion === 'SHIPPING' && (
+                <div className="pt-2 text-xs text-[#666666] space-y-1.5 font-sans animate-fade-in">
+                  <p>• Dispatched within 3-5 business days across Pan-India.</p>
+                  <p>• Tracking links emailed upon courier dispatch.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Accordion 5: RETURNS */}
+            <div className="border-b border-[#E5E2DC] pb-3">
+              <button
+                onClick={() => toggleAccordion('RETURNS')}
+                className="w-full flex justify-between items-center py-2 text-xs font-bold uppercase tracking-widest text-[#111111] font-display"
+              >
+                <span>RETURNS</span>
+                {openAccordion === 'RETURNS' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {openAccordion === 'RETURNS' && (
+                <div className="pt-2 text-xs text-[#666666] space-y-1.5 font-sans animate-fade-in">
+                  <p>• 7-day exchange window for sizing or print issues.</p>
+                  <p>• Items must be unwashed and unworn with original tags.</p>
+                </div>
+              )}
+            </div>
+
           </div>
 
         </div>
 
       </div>
 
-      {/* Related Products Grid ("You May Also Like") */}
+      {/* Section 27: Related Products ("YOU MAY ALSO LIKE") */}
       {relatedProducts.length > 0 && (
-        <section className="space-y-6 pt-10 border-t border-[#DDD7CB]">
+        <section className="space-y-6 pt-10 border-t border-[#E5E2DC]">
           <div className="flex items-end justify-between">
             <div>
-              <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
-                CURATED FOR YOU
+              <span className="text-xs font-mono font-bold text-[#6F7358] uppercase tracking-widest block">
+                CURATED RECOMMENDATIONS
               </span>
-              <h2 className="text-2xl font-extrabold uppercase text-[#292621] font-display">
+              <h2 className="text-2xl font-extrabold uppercase text-[#111111] font-display">
                 YOU MAY ALSO LIKE
               </h2>
             </div>
-            <Link to="/shop" className="text-xs font-bold uppercase tracking-wider text-[#292621] hover:text-[#B89452] transition-colors">
+            <Link to="/shop" className="text-xs font-bold uppercase tracking-wider text-[#111111] hover:text-[#6F7358] transition-colors">
               EXPLORE ALL
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedProducts.slice(0, 4).map((relProduct) => (
               <ProductCard key={relProduct._id} product={relProduct} />
             ))}
@@ -301,13 +361,13 @@ export default function ProductDetail() {
       {/* Reviews Section */}
       <ReviewSection productId={product._id} />
 
-      {/* Size Guide Modal */}
+      {/* Section 24: Size Guide Modal / Drawer */}
       {showSizeGuide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white border border-[#DDD7CB] shadow-fashion-lg p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white border border-[#E5E2DC] rounded-t-2xl sm:rounded-2xl shadow-fashion-lg p-6 relative self-end sm:self-center">
             <button
               onClick={() => setShowSizeGuide(false)}
-              className="absolute top-4 right-4 text-[#6F6A61] hover:text-[#292621] font-bold"
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] font-bold text-lg"
             >
               ✕
             </button>
@@ -316,17 +376,17 @@ export default function ProductDetail() {
         </div>
       )}
 
-      {/* Sticky Mobile Purchase Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-[#DDD7CB] flex gap-2 shadow-fashion-hover">
+      {/* Mobile Sticky CTA Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-[#E5E2DC] flex gap-2 shadow-fashion-hover">
         <button
           onClick={handleAddToCart}
-          className="btn-outline flex-1 py-3 text-[11px] font-extrabold tracking-widest"
+          className="btn-primary flex-1 py-3 text-[11px] font-extrabold tracking-widest"
         >
           ADD TO CART
         </button>
         <button
           onClick={handleBuyNow}
-          className="btn-primary flex-1 py-3 text-[11px] font-extrabold tracking-widest"
+          className="btn-outline flex-1 py-3 text-[11px] font-extrabold tracking-widest"
         >
           BUY NOW
         </button>

@@ -3,13 +3,13 @@ import React from 'react';
 export default function AddressForm({ address, onChange }) {
   return (
     <div className="space-y-4">
-      <h3 className="font-extrabold text-xs text-brand-espresso uppercase tracking-widest font-display">
+      <h3 className="font-extrabold text-xs text-[#111111] uppercase tracking-widest font-display">
         1. SHIPPING & CONTACT DETAILS
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Full Name *
           </label>
           <input
@@ -23,7 +23,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Phone Number *
           </label>
           <input
@@ -37,7 +37,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Email Address (For Tracking & Invoice) *
           </label>
           <input
@@ -51,7 +51,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Street Address / House No / Locality *
           </label>
           <input
@@ -65,7 +65,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             City *
           </label>
           <input
@@ -79,7 +79,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             State *
           </label>
           <input
@@ -93,7 +93,7 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Pincode *
           </label>
           <input
@@ -107,18 +107,19 @@ export default function AddressForm({ address, onChange }) {
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-brand-grey uppercase tracking-widest mb-1 font-mono">
+          <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
             Country
           </label>
           <input
             type="text"
             readOnly
             value="India"
-            className="fashion-input bg-brand-cream text-brand-grey cursor-not-allowed"
+            className="fashion-input bg-[#F7F5F0] text-[#666666] cursor-not-allowed"
           />
         </div>
       </div>
     </div>
   );
 }
+
 

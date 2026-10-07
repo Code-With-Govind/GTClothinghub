@@ -22,22 +22,23 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-16 space-y-8 bg-[#F7F5F0]">
       <SEO title="Frequently Asked Questions" />
-      <div className="border-b border-neutral-200 pb-6 text-center space-y-2">
-        <span className="text-xs font-bold text-[#C8A96B] tracking-widest uppercase font-mono">Help Center</span>
-        <h1 className="text-3xl font-black text-[#171717] uppercase font-display tracking-tight">Frequently Asked Questions</h1>
+      <div className="border-b border-[#E5E2DC] pb-6 text-center space-y-2">
+        <span className="text-xs font-bold text-[#6F7358] tracking-widest uppercase font-mono">Help Center</span>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#111111] uppercase font-display tracking-tight">Frequently Asked Questions</h1>
       </div>
 
       <div className="space-y-4">
         {faqs.map((faq, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-6 border border-neutral-200/80 shadow-sm space-y-2">
-            <h3 className="font-bold text-base text-[#171717] font-display">{faq.q}</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">{faq.a}</p>
+          <div key={idx} className="bg-white rounded-2xl p-6 border border-[#E5E2DC] shadow-xs space-y-2">
+            <h3 className="font-extrabold text-base text-[#111111] font-display">{faq.q}</h3>
+            <p className="text-xs text-[#666666] leading-relaxed">{faq.a}</p>
           </div>
         ))}
       </div>
     </div>
   );
 }
+
 

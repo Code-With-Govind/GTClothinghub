@@ -4,84 +4,84 @@
 
 @layer base {
   body {
-    background-color: #F5F1E8;
-    color: #292621;
-    @apply font-sans antialiased overflow-x-hidden min-h-screen selection:bg-[#292621] selection:text-white;
+    background-color: #F7F5F0;
+    color: #111111;
+    @apply font-sans antialiased overflow-x-hidden min-h-screen selection:bg-[#111111] selection:text-white;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight text-[#292621] font-extrabold uppercase;
+    @apply font-display tracking-tight text-[#111111] font-extrabold uppercase;
   }
 }
 
 /* Custom Minimalist Fashion Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F5F1E8;
+  background: #F7F5F0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #DDD7CB;
-  border-radius: 2px;
+  background: #E5E2DC;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #292621;
+  background: #111111;
 }
 
 /* Minimalist Fashion Design Tokens & Component Utility Classes */
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#292621] text-white text-xs font-bold uppercase tracking-widest rounded-none border border-[#292621] hover:bg-[#36322B] hover:border-[#36322B] transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[48px] bg-[#111111] text-white text-xs font-bold uppercase tracking-widest rounded-lg border border-[#111111] hover:bg-[#222222] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-[#292621] text-xs font-bold uppercase tracking-widest rounded-none border border-[#292621] hover:bg-[#292621] hover:text-white transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[48px] bg-transparent text-[#111111] text-xs font-bold uppercase tracking-widest rounded-lg border border-[#111111] hover:bg-[#111111] hover:text-white hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FAF8F3] text-[#292621] text-xs font-bold uppercase tracking-wider rounded-none border border-[#DDD7CB] hover:bg-[#DDD7CB] transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] bg-[#F7F5F0] text-[#111111] text-xs font-bold uppercase tracking-wider rounded-lg border border-[#E5E2DC] hover:border-[#111111] hover:-translate-y-[1px] transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-transparent text-[#292621] hover:text-[#B89452] text-xs font-semibold uppercase tracking-wider transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-transparent text-[#111111] hover:text-[#6F7358] text-xs font-semibold uppercase tracking-wider transition-all duration-200;
   }
 
   /* Cards */
   .fashion-card {
-    @apply bg-white border border-[#DDD7CB] transition-all duration-300 hover:border-[#292621] hover:shadow-fashion-md;
+    @apply bg-white border border-[#E5E2DC] rounded-xl transition-all duration-300 hover:border-[#111111] hover:shadow-fashion-md;
   }
 
   .fashion-panel {
-    @apply bg-white border border-[#DDD7CB] p-6 sm:p-8;
+    @apply bg-white border border-[#E5E2DC] rounded-xl p-6 sm:p-8;
   }
 
   .glass-card {
-    @apply bg-white/90 backdrop-blur-md border border-[#DDD7CB] transition-all duration-300;
+    @apply bg-white/95 backdrop-blur-md border border-[#E5E2DC] rounded-xl transition-all duration-300;
   }
 
   /* Form Controls */
   .fashion-input {
-    @apply w-full px-4 py-3.5 bg-white text-[#292621] placeholder-[#6F6A61] text-xs font-medium border border-[#DDD7CB] rounded-none focus:outline-none focus:border-[#292621] focus:ring-1 focus:ring-[#292621] transition-all duration-200;
+    @apply w-full px-4 py-3.5 bg-white text-[#111111] placeholder-[#666666] text-xs font-medium border border-[#E5E2DC] rounded-lg focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111] transition-all duration-200;
   }
 
   .fashion-select {
-    @apply w-full px-4 py-3.5 bg-white text-[#292621] text-xs font-bold uppercase tracking-wider border border-[#DDD7CB] rounded-none focus:outline-none focus:border-[#292621] transition-all duration-200;
+    @apply w-full px-4 py-3.5 bg-white text-[#111111] text-xs font-bold uppercase tracking-wider border border-[#E5E2DC] rounded-lg focus:outline-none focus:border-[#111111] transition-all duration-200;
   }
 
   /* Badges */
   .fashion-badge {
-    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#292621] text-white;
+    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#111111] text-white rounded-md;
   }
 
   .fashion-badge-subtle {
-    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-[#FAF8F3] text-[#292621] border border-[#DDD7CB];
+    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-[#F7F5F0] text-[#111111] border border-[#E5E2DC] rounded-md;
   }
 
   .fashion-badge-accent {
-    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#B89452] text-white;
+    @apply inline-flex items-center px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#6F7358] text-white rounded-md;
   }
 }
 

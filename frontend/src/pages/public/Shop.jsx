@@ -70,20 +70,20 @@ export default function Shop() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 bg-[#F5F1E8]">
-      <SEO title="Shop Collection Catalog | GT CLOTHING HUB" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 bg-[#F7F5F0]">
+      <SEO title="Shop Catalog | GT CLOTHING HUB" />
 
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#DDD7CB] pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#E5E2DC] pb-6">
         <div>
-          <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
-            APPAREL COLLECTION
+          <span className="text-[10px] font-mono font-bold text-[#6F7358] uppercase tracking-widest block">
+            GT APPAREL CATALOG
           </span>
-          <h1 className="text-3xl font-extrabold uppercase text-[#292621] font-display">
-            {mainSection ? mainSection : 'ALL PRODUCTS'}
+          <h1 className="text-3xl font-extrabold uppercase text-[#111111] font-display">
+            {mainSection ? mainSection : search ? `SEARCH: "${search}"` : 'ALL PRODUCTS'}
           </h1>
           {subSection && (
-            <span className="inline-block mt-1.5 px-3 py-0.5 text-[10px] font-bold bg-[#292621] text-white uppercase font-mono tracking-wider">
+            <span className="inline-block mt-1.5 px-3 py-0.5 text-[10px] font-bold bg-[#111111] text-white uppercase font-mono tracking-wider rounded-md">
               SECTION: {subSection}
             </span>
           )}
@@ -111,34 +111,34 @@ export default function Shop() {
         </div>
       </div>
 
-      {/* Main Section Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 bg-white p-2 border border-[#DDD7CB]">
-        <span className="text-[10px] font-mono font-bold uppercase text-[#6F6A61] px-3">
-          FIT TYPE:
+      {/* Main Fit Section Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 bg-white p-2 border border-[#E5E2DC] rounded-xl">
+        <span className="text-[10px] font-mono font-bold uppercase text-[#666666] px-3">
+          FIT SELECTION:
         </span>
         <button
           onClick={() => updateFilter('mainSection', '')}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${
-            !mainSection ? 'bg-[#292621] text-white' : 'text-[#292621] hover:bg-[#FAF8F3]'
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${
+            !mainSection ? 'bg-[#111111] text-white' : 'text-[#111111] hover:bg-[#F7F5F0]'
           }`}
         >
           ALL FITS
         </button>
         <button
           onClick={() => updateFilter('mainSection', 'Regular T-Shirts')}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${
-            mainSection === 'Regular T-Shirts' ? 'bg-[#292621] text-white' : 'text-[#292621] hover:bg-[#FAF8F3]'
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${
+            mainSection === 'Regular T-Shirts' ? 'bg-[#111111] text-white' : 'text-[#111111] hover:bg-[#F7F5F0]'
           }`}
         >
-          REGULAR T-SHIRTS
+          REGULAR TEES
         </button>
         <button
           onClick={() => updateFilter('mainSection', 'Oversized T-Shirts')}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${
-            mainSection === 'Oversized T-Shirts' ? 'bg-[#292621] text-white' : 'text-[#292621] hover:bg-[#FAF8F3]'
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${
+            mainSection === 'Oversized T-Shirts' ? 'bg-[#111111] text-white' : 'text-[#111111] hover:bg-[#F7F5F0]'
           }`}
         >
-          OVERSIZED T-SHIRTS
+          OVERSIZED TEES
         </button>
       </div>
 
@@ -146,14 +146,14 @@ export default function Shop() {
         
         {/* Filters Sidebar */}
         <aside className={`space-y-6 ${mobileFilterOpen ? 'block' : 'hidden md:block'}`}>
-          <div className="bg-white border border-[#DDD7CB] p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-[#DDD7CB] pb-4">
-              <h3 className="font-bold text-xs uppercase tracking-widest text-[#292621] flex items-center gap-2 font-display">
-                <Filter className="w-4 h-4 text-[#292621]" /> FILTERS
+          <div className="bg-white border border-[#E5E2DC] rounded-2xl p-6 space-y-6 shadow-fashion-sm">
+            <div className="flex items-center justify-between border-b border-[#E5E2DC] pb-4">
+              <h3 className="font-bold text-xs uppercase tracking-widest text-[#111111] flex items-center gap-2 font-display">
+                <Filter className="w-4 h-4 text-[#111111]" /> FILTERS
               </h3>
               <button
                 onClick={clearFilters}
-                className="text-[10px] font-bold uppercase text-[#6F6A61] hover:text-[#292621] flex items-center gap-1 font-mono"
+                className="text-[10px] font-bold uppercase text-[#666666] hover:text-[#111111] flex items-center gap-1 font-mono"
               >
                 <RefreshCw className="w-3 h-3" /> RESET
               </button>
@@ -161,14 +161,14 @@ export default function Shop() {
 
             {/* Sub Section Filter */}
             <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#6F6A61] uppercase font-mono tracking-widest">
-                SUB SECTION
+              <span className="text-[10px] font-bold text-[#666666] uppercase font-mono tracking-widest">
+                GARMENT TYPE
               </span>
               <div className="space-y-1">
                 <button
                   onClick={() => updateFilter('subSection', '')}
-                  className={`w-full text-left px-3 py-2 text-xs font-semibold uppercase transition-colors ${
-                    !subSection ? 'bg-[#292621] text-white' : 'text-[#292621] hover:bg-[#FAF8F3]'
+                  className={`w-full text-left px-3 py-2 text-xs font-semibold uppercase rounded-lg transition-colors ${
+                    !subSection ? 'bg-[#111111] text-white' : 'text-[#111111] hover:bg-[#F7F5F0]'
                   }`}
                 >
                   All Types
@@ -177,8 +177,8 @@ export default function Shop() {
                   <button
                     key={sub}
                     onClick={() => updateFilter('subSection', sub === subSection ? '' : sub)}
-                    className={`w-full text-left px-3 py-2 text-xs font-semibold uppercase transition-colors ${
-                      subSection === sub ? 'bg-[#292621] text-white' : 'text-[#292621] hover:bg-[#FAF8F3]'
+                    className={`w-full text-left px-3 py-2 text-xs font-semibold uppercase rounded-lg transition-colors ${
+                      subSection === sub ? 'bg-[#111111] text-white' : 'text-[#111111] hover:bg-[#F7F5F0]'
                     }`}
                   >
                     {sub}
@@ -188,36 +188,38 @@ export default function Shop() {
             </div>
 
             {/* Category Filter */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#6F6A61] uppercase font-mono tracking-widest">
-                CATEGORIES
-              </span>
-              <div className="space-y-1">
-                <button
-                  onClick={() => updateFilter('category', '')}
-                  className={`w-full text-left px-3 py-1.5 text-xs font-medium uppercase transition-colors ${
-                    !category ? 'bg-[#292621] text-white font-bold' : 'text-[#6F6A61] hover:text-[#292621]'
-                  }`}
-                >
-                  All Categories
-                </button>
-                {categories.map((cat) => (
+            {categories.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-[#666666] uppercase font-mono tracking-widest">
+                  CATEGORIES
+                </span>
+                <div className="space-y-1">
                   <button
-                    key={cat._id}
-                    onClick={() => updateFilter('category', cat.slug)}
-                    className={`w-full text-left px-3 py-1.5 text-xs font-medium uppercase transition-colors ${
-                      category === cat.slug ? 'bg-[#292621] text-white font-bold' : 'text-[#6F6A61] hover:text-[#292621]'
+                    onClick={() => updateFilter('category', '')}
+                    className={`w-full text-left px-3 py-1.5 text-xs font-medium uppercase rounded-md transition-colors ${
+                      !category ? 'bg-[#111111] text-white font-bold' : 'text-[#666666] hover:text-[#111111]'
                     }`}
                   >
-                    {cat.name}
+                    All Categories
                   </button>
-                ))}
+                  {categories.map((cat) => (
+                    <button
+                      key={cat._id}
+                      onClick={() => updateFilter('category', cat.slug)}
+                      className={`w-full text-left px-3 py-1.5 text-xs font-medium uppercase rounded-md transition-colors ${
+                        category === cat.slug ? 'bg-[#111111] text-white font-bold' : 'text-[#666666] hover:text-[#111111]'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Size Filter */}
             <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#6F6A61] uppercase font-mono tracking-widest">
+              <span className="text-[10px] font-bold text-[#666666] uppercase font-mono tracking-widest">
                 SIZES
               </span>
               <div className="flex flex-wrap gap-2">
@@ -225,8 +227,8 @@ export default function Shop() {
                   <button
                     key={sz}
                     onClick={() => updateFilter('size', size === sz ? '' : sz)}
-                    className={`px-3 py-1.5 text-xs font-bold border transition-all ${
-                      size === sz ? 'bg-[#292621] border-[#292621] text-white' : 'border-[#DDD7CB] text-[#6F6A61] hover:border-[#292621]'
+                    className={`px-3 py-1.5 text-xs font-bold border rounded-md transition-all ${
+                      size === sz ? 'bg-[#111111] border-[#111111] text-white' : 'border-[#E5E2DC] text-[#666666] hover:border-[#111111]'
                     }`}
                   >
                     {sz}
@@ -237,7 +239,7 @@ export default function Shop() {
 
             {/* Price Filter */}
             <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#6F6A61] uppercase font-mono tracking-widest">
+              <span className="text-[10px] font-bold text-[#666666] uppercase font-mono tracking-widest">
                 PRICE RANGE (₹)
               </span>
               <div className="flex items-center gap-2">
@@ -248,7 +250,7 @@ export default function Shop() {
                   onChange={(e) => updateFilter('minPrice', e.target.value)}
                   className="fashion-input py-1.5 px-3 text-xs"
                 />
-                <span className="text-[#6F6A61]">-</span>
+                <span className="text-[#666666]">-</span>
                 <input
                   type="number"
                   placeholder="Max"
@@ -265,25 +267,26 @@ export default function Shop() {
         {/* Product Grid */}
         <main className="md:col-span-3 space-y-8">
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-80 bg-white border border-[#DDD7CB] animate-pulse" />
+                <div key={i} className="h-80 bg-white border border-[#E5E2DC] rounded-xl animate-pulse" />
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-20 bg-white border border-[#DDD7CB] space-y-4">
-              <Search className="w-10 h-10 text-[#6F6A61] mx-auto" />
-              <h3 className="text-sm font-bold text-[#292621] uppercase tracking-wider">No Products Found</h3>
-              <p className="text-xs text-[#6F6A61]">Try adjusting your filter criteria or price range.</p>
+            /* Section 35 & 45: Section Empty States */
+            <div className="text-center py-20 bg-white border border-[#E5E2DC] rounded-2xl space-y-4 shadow-fashion-sm">
+              <Search className="w-10 h-10 text-[#666666] mx-auto" />
+              <h3 className="text-base font-bold text-[#111111] uppercase tracking-wider font-display">NO PRODUCTS FOUND</h3>
+              <p className="text-xs text-[#666666]">Try another search or reset active filters.</p>
               <button
                 onClick={clearFilters}
                 className="btn-primary"
               >
-                Reset All Filters
+                RESET ALL FILTERS
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {products.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
@@ -299,10 +302,10 @@ export default function Shop() {
                   <button
                     key={pageNum}
                     onClick={() => updateFilter('page', pageNum.toString())}
-                    className={`w-9 h-9 text-xs font-bold border transition-all ${
+                    className={`w-9 h-9 text-xs font-bold border rounded-lg transition-all ${
                       page === pageNum
-                        ? 'bg-[#292621] border-[#292621] text-white'
-                        : 'bg-white border-[#DDD7CB] text-[#6F6A61] hover:border-[#292621] hover:text-[#292621]'
+                        ? 'bg-[#111111] border-[#111111] text-white'
+                        : 'bg-white border-[#E5E2DC] text-[#666666] hover:border-[#111111] hover:text-[#111111]'
                     }`}
                   >
                     {pageNum}

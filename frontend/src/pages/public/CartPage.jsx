@@ -11,15 +11,15 @@ export default function CartPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F5F1E8]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 bg-[#F7F5F0]">
       <SEO title="Shopping Bag | GT CLOTHING HUB" />
 
-      <div className="flex items-center justify-between border-b border-[#DDD7CB] pb-6">
+      <div className="flex items-center justify-between border-b border-[#E5E2DC] pb-6">
         <div>
-          <span className="text-[10px] font-mono font-bold text-[#6F6A61] uppercase tracking-widest block">
+          <span className="text-[10px] font-mono font-bold text-[#6F7358] uppercase tracking-widest block">
             YOUR SELECTION
           </span>
-          <h1 className="text-3xl font-extrabold text-[#292621] uppercase font-display">
+          <h1 className="text-3xl font-extrabold text-[#111111] uppercase font-display">
             SHOPPING BAG
           </h1>
         </div>
@@ -35,21 +35,24 @@ export default function CartPage() {
       </div>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-[#DDD7CB] space-y-4 shadow-fashion-sm">
-          <ShoppingBag className="w-12 h-12 text-[#6F6A61] mx-auto" />
-          <h2 className="text-lg font-bold text-[#292621] uppercase tracking-wider">Your shopping bag is empty</h2>
-          <p className="text-xs text-[#6F6A61]">Discover our latest drop collections and select your preferred items.</p>
-          <Link
-            to="/shop"
-            className="btn-primary inline-block"
-          >
-            EXPLORE CATALOG
-          </Link>
+        /* Section 45: Empty States */
+        <div className="text-center py-20 bg-white border border-[#E5E2DC] rounded-2xl space-y-4 shadow-fashion-sm">
+          <ShoppingBag className="w-12 h-12 text-[#666666] mx-auto" />
+          <h2 className="text-xl font-extrabold text-[#111111] uppercase tracking-wider font-display">YOUR CART IS EMPTY</h2>
+          <p className="text-xs text-[#666666] max-w-sm mx-auto font-medium">Looks like you haven't added anything yet.</p>
+          <div className="pt-2">
+            <Link
+              to="/shop"
+              className="btn-primary"
+            >
+              SHOP PRODUCTS
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Cart Items */}
+          {/* Cart Items List */}
           <div className="lg:col-span-2 space-y-3">
             {cartItems.map((item, idx) => (
               <CartItem
@@ -61,37 +64,37 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Checkout Card */}
-          <div className="bg-white border border-[#DDD7CB] p-6 space-y-6 h-fit shadow-fashion-sm">
-            <h3 className="font-extrabold text-xs text-[#292621] uppercase tracking-widest font-display">
+          {/* Section 28: Order Summary Card */}
+          <div className="bg-white border border-[#E5E2DC] rounded-2xl p-6 space-y-6 h-fit shadow-fashion-sm">
+            <h3 className="font-extrabold text-xs text-[#111111] uppercase tracking-widest font-display">
               ORDER SUMMARY
             </h3>
 
-            <div className="space-y-3 text-xs text-[#6F6A61] border-b border-[#DDD7CB] pb-4">
+            <div className="space-y-3 text-xs text-[#666666] border-b border-[#E5E2DC] pb-4 font-mono">
               <div className="flex justify-between">
                 <span>Items Subtotal</span>
-                <span className="font-bold text-[#292621]">{formatPrice(cartSubtotal)}</span>
+                <span className="font-bold text-[#111111]">{formatPrice(cartSubtotal)}</span>
               </div>
-              <div className="flex justify-between font-mono text-[11px]">
+              <div className="flex justify-between text-[11px]">
                 <span>Shipping</span>
                 <span>Calculated at checkout</span>
               </div>
-              <div className="flex justify-between font-mono text-[11px]">
+              <div className="flex justify-between text-[11px]">
                 <span>Taxes</span>
-                <span>Calculated at checkout</span>
+                <span>Included in price</span>
               </div>
             </div>
 
-            <div className="flex justify-between items-baseline text-xs font-bold text-[#292621] uppercase tracking-wider">
-              <span>ESTIMATED TOTAL</span>
-              <span className="text-2xl font-extrabold text-[#292621] font-display">{formatPrice(cartSubtotal)}</span>
+            <div className="flex justify-between items-baseline text-xs font-bold text-[#111111] uppercase tracking-wider">
+              <span>TOTAL AMOUNT</span>
+              <span className="text-2xl font-extrabold text-[#111111] font-mono">{formatPrice(cartSubtotal)}</span>
             </div>
 
             <button
               onClick={() => navigate('/checkout')}
               className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2"
             >
-              PROCEED TO CHECKOUT <ArrowRight className="w-4 h-4" />
+              CHECKOUT <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
