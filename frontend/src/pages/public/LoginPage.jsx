@@ -16,11 +16,24 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login, sendPhoneOtp, verifyPhoneOtp } = useAuth();
+  const { user: currentUser, login, sendPhoneOtp, verifyPhoneOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/account';
+  const from = (location.state?.from?.pathname && location.state.from.pathname !== '/login' && location.state.from.pathname !== '/account') 
+    ? location.state.from.pathname 
+    : '/';
+
+  React.useEffect(() => {
+    if (currentUser) {
+      if (currentUser.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [currentUser, navigate]);
+
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();

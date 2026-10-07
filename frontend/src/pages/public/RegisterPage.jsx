@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Phone, ArrowRight, AlertTriangle, CheckCircle2, ShieldCheck } from 'lucide-react';
 import SEO from '../../components/common/SEO';
@@ -21,8 +21,14 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register, sendEmailOtp, sendPhoneOtp, verifyEmailOtp, verifyPhoneOtp } = useAuth();
+  const { user, register, sendEmailOtp, sendPhoneOtp, verifyEmailOtp, verifyPhoneOtp } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleRegisterInitial = async (e) => {
     e.preventDefault();
@@ -38,13 +44,13 @@ export default function RegisterPage() {
 
     try {
       // 1. Create User
-      const user = await register(name, email, password, phone);
+      const userRes = await register(name, email, password, phone);
       setSuccess('Account created! Verification codes sent.');
 
       // 2. Trigger Email & Phone OTPs in background
       try {
         const eRes = await sendEmailOtp(email);
-        if (eRes.demoOtp) setDemoEmailOtp(eRes.demoOtp);
+        if (eRes?.demoOtp) setDemoEmailOtp(eRes.demoOtp);
       } catch (err) {
         console.warn('Email OTP trigger note:', err);
       }
@@ -52,7 +58,7 @@ export default function RegisterPage() {
       if (phone) {
         try {
           const pRes = await sendPhoneOtp(phone);
-          if (pRes.demoOtp) setDemoPhoneOtp(pRes.demoOtp);
+          if (pRes?.demoOtp) setDemoPhoneOtp(pRes.demoOtp);
         } catch (err) {
           console.warn('Phone OTP trigger note:', err);
         }
@@ -82,7 +88,7 @@ export default function RegisterPage() {
 
       setSuccess('Account verified successfully! Redirecting...');
       setTimeout(() => {
-        navigate('/account');
+        navigate('/');
       }, 1200);
     } catch (err) {
       setError(err.message || 'Invalid verification OTP code.');
@@ -231,7 +237,7 @@ export default function RegisterPage() {
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => navigate('/account')}
+                  onClick={() => navigate('/')}
                   className="btn-secondary flex-1 py-3 text-xs font-bold uppercase"
                 >
                   Skip For Now

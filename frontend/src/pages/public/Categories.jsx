@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shirt, Palette, Paintbrush } from 'lucide-react';
 import SEO from '../../components/common/SEO';
-import MovingCategoriesMarquee from '../../components/common/MovingCategoriesMarquee';
 
 export default function Categories() {
+
   const sections = [
     {
       mainTitle: 'Regular T-Shirts',
@@ -75,8 +75,6 @@ export default function Categories() {
         <p className="text-xs text-[#666666] mt-1">Explore Regular T-Shirts and Oversized T-Shirts by Plain, Printed, or Custom Design types.</p>
       </div>
 
-      {/* Moving Category Marquee Slider */}
-      <MovingCategoriesMarquee />
 
       {/* Main Sections Grid */}
       {sections.map((sec, idx) => (
