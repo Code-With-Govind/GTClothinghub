@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /product/
+Allow: /categories
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /size-guide
+Allow: /terms
+Allow: /privacy-policy
+Allow: /return-policy
+Allow: /shipping-policy
+
+Disallow: /admin/
+Disallow: /account/
+Disallow: /checkout
+
+Sitemap: https://gt-clothinghub.vercel.app/sitemap.xml

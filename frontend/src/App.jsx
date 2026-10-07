@@ -31,6 +31,8 @@ import LoginPage from './pages/public/LoginPage';
 import RegisterPage from './pages/public/RegisterPage';
 import ForgotPasswordPage from './pages/public/ForgotPasswordPage';
 import ResetPasswordPage from './pages/public/ResetPasswordPage';
+import NotFoundPage from './pages/public/NotFoundPage';
+
 
 // User Account Pages
 import MyAccount from './pages/user/MyAccount';
@@ -109,7 +111,11 @@ export default function App() {
                 <Route path="/admin/analytics" element={<ProtectedRoute requireAdmin={true}><Analytics /></ProtectedRoute>} />
                 <Route path="/admin/audit-logs" element={<ProtectedRoute requireAdmin={true}><AuditLogsPage /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute requireAdmin={true}><WebsiteSettingsPage /></ProtectedRoute>} />
+
+                {/* CATCH-ALL 404 NOT FOUND */}
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
+
             </main>
 
             {!isAdminRoute && <Footer />}

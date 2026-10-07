@@ -98,9 +98,37 @@ export default function ProductDetail() {
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : null;
 
+  const productSchema = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.images?.length > 0 ? product.images : [activeImage],
+    description: product.description,
+    sku: product._id,
+    brand: {
+      '@type': 'Brand',
+      name: 'GT CLOTHING HUB',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://gt-clothinghub.vercel.app/product/${product.slug}`,
+      priceCurrency: 'INR',
+      price: product.price,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.inStock !== false ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+  } : null;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 bg-[#F7F5F0]">
-      <SEO title={product.seoTitle || `${product.name} | GT CLOTHING HUB`} description={product.seoDescription || product.description} />
+      <SEO
+        title={product.seoTitle || `${product.name} | GT CLOTHING HUB`}
+        description={product.seoDescription || product.description}
+        image={activeImage}
+        path={`/product/${product.slug}`}
+        schema={productSchema}
+      />
+
 
       <Link to="/shop" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#666666] hover:text-[#111111] transition-colors font-mono">
         <ArrowLeft className="w-4 h-4" /> CATALOG
