@@ -2,33 +2,35 @@ const PODInterface = require('./podInterface');
 const axios = require('axios');
 
 class QikinkService extends PODInterface {
-  constructor() {
-    super();
-    this.mode = (process.env.POD_MODE || 'mock').toLowerCase();
-    const defaultUrl = this.mode === 'sandbox' ? 'https://sandbox.qikink.com' : 'https://api.qikink.com';
-    this.apiUrl = process.env.POD_API_URL || defaultUrl;
-    this.apiKey = process.env.POD_API_KEY;
-    this.apiSecret = process.env.POD_API_SECRET;
-    this.accessToken = null;
-    this.tokenExpiry = null;
+  getApiUrl() {
+    const mode = (process.env.POD_MODE || 'mock').toLowerCase();
+    if (mode === 'live') {
+      return 'https://api.qikink.com';
+    }
+    return process.env.POD_API_URL || 'https://sandbox.qikink.com';
+  }
+
+  getCredentials() {
+    return {
+      apiKey: (process.env.POD_API_KEY || '').trim(),
+      apiSecret: (process.env.POD_API_SECRET || '').trim(),
+    };
   }
 
   async getAccessToken() {
-    if (!this.apiKey || !this.apiSecret) {
-      throw new Error('Qikink POD API credentials (POD_API_KEY / POD_API_SECRET) are missing in .env file.');
-    }
+    const { apiKey, apiSecret } = this.getCredentials();
+    const apiUrl = this.getApiUrl();
 
-    // Return cached token if still valid
-    if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
-      return this.accessToken;
+    if (!apiKey || !apiSecret) {
+      throw new Error('Qikink POD API credentials (POD_API_KEY / POD_API_SECRET) are missing in .env file.');
     }
 
     try {
       const params = new URLSearchParams();
-      params.append('ClientId', this.apiKey);
-      params.append('client_secret', this.apiSecret);
+      params.append('ClientId', apiKey);
+      params.append('client_secret', apiSecret);
 
-      const response = await axios.post(`${this.apiUrl}/api/token`, params, {
+      const response = await axios.post(`${apiUrl}/api/token`, params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -36,11 +38,7 @@ class QikinkService extends PODInterface {
       });
 
       if (response.data?.Accesstoken || response.data?.access_token || response.data?.token) {
-        this.accessToken = response.data.Accesstoken || response.data.access_token || response.data.token;
-        // Cache token for 1 hour (or expires_in)
-        const expiresIn = response.data.expires_in || 3600;
-        this.tokenExpiry = Date.now() + (expiresIn - 60) * 1000;
-        return this.accessToken;
+        return response.data.Accesstoken || response.data.access_token || response.data.token;
       }
 
       throw new Error(response.data?.error || response.data?.message || 'Invalid authentication response from Qikink API.');
@@ -52,13 +50,15 @@ class QikinkService extends PODInterface {
 
   async submitFulfillmentOrder(order) {
     const token = await this.getAccessToken();
+    const apiUrl = this.getApiUrl();
+    const mode = (process.env.POD_MODE || 'mock').toLowerCase();
 
     const payload = {
       order_number: String(order.orderNumber).slice(0, 15),
       payment_type: order.paymentMethod === 'COD' ? 'COD' : 'PREPAID',
       cod_amount: order.paymentMethod === 'COD' ? String(order.total) : '0',
       total_order_value: String(order.total),
-      search_from_my_products: this.mode === 'sandbox' ? 0 : 1,
+      search_from_my_products: mode === 'sandbox' ? 0 : 1,
       shipping_address: {
         first_name: order.shippingAddress.fullName,
         phone: order.shippingAddress.phone,
@@ -77,7 +77,7 @@ class QikinkService extends PODInterface {
     };
 
     try {
-      const response = await axios.post(`${this.apiUrl}/api/order/create`, payload, {
+      const response = await axios.post(`${apiUrl}/api/order/create`, payload, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -102,8 +102,9 @@ class QikinkService extends PODInterface {
 
   async getFulfillmentStatus(podOrderId) {
     const token = await this.getAccessToken();
+    const apiUrl = this.getApiUrl();
 
-    const response = await axios.get(`${this.apiUrl}/api/order/${podOrderId}`, {
+    const response = await axios.get(`${apiUrl}/api/order/${podOrderId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -120,9 +121,10 @@ class QikinkService extends PODInterface {
 
   async cancelFulfillmentOrder(podOrderId) {
     const token = await this.getAccessToken();
+    const apiUrl = this.getApiUrl();
 
     const response = await axios.post(
-      `${this.apiUrl}/api/order/cancel`,
+      `${apiUrl}/api/order/cancel`,
       { order_id: podOrderId },
       {
         headers: {
@@ -140,12 +142,13 @@ class QikinkService extends PODInterface {
   }
 
   async testConnection() {
+    const apiUrl = this.getApiUrl();
     try {
       const token = await this.getAccessToken();
       return {
         success: true,
         provider: 'QIKINK',
-        apiUrl: this.apiUrl,
+        apiUrl,
         message: 'Successfully authenticated with Qikink API & retrieved Access Token!',
         hasToken: !!token,
       };
@@ -153,7 +156,7 @@ class QikinkService extends PODInterface {
       return {
         success: false,
         provider: 'QIKINK',
-        apiUrl: this.apiUrl,
+        apiUrl,
         message: error.message,
       };
     }
