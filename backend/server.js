@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const connectDB = require('./config/db');
+const ensureAdminAndInitialData = require('./utils/seedAdmin');
 const checkProductionSafety = require('./middleware/productionGuard');
 const { apiLimiter } = require('./middleware/rateLimiterMiddleware');
 const errorHandler = require('./middleware/errorMiddleware');
@@ -13,8 +14,10 @@ dotenv.config();
 // Run Production Safety Check before startup
 checkProductionSafety();
 
-// Connect Database
-connectDB();
+// Connect Database & Ensure Admin Credentials
+connectDB().then(() => {
+  ensureAdminAndInitialData();
+});
 
 const app = express();
 
