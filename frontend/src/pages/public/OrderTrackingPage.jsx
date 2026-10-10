@@ -15,14 +15,17 @@ export default function OrderTrackingPage() {
 
   const fetchTracking = async (e) => {
     if (e) e.preventDefault();
-    if (!orderNumber || !trackingToken) {
-      return setError('Both Order Number and Secure Tracking Token are required to lookup status.');
+    if (!orderNumber) {
+      return setError('Please enter your Order Number.');
     }
 
     setLoading(true);
     setError('');
     try {
-      const res = await api.post('/orders/track', { orderNumber, trackingToken });
+      const payload = { orderNumber: orderNumber.trim() };
+      if (trackingToken.trim()) payload.trackingToken = trackingToken.trim();
+
+      const res = await api.post('/orders/track', payload);
       setOrder(res.order);
     } catch (err) {
       setError(err.message);
@@ -33,7 +36,7 @@ export default function OrderTrackingPage() {
   };
 
   useEffect(() => {
-    if (searchParams.get('orderNumber') && searchParams.get('trackingToken')) {
+    if (searchParams.get('orderNumber')) {
       fetchTracking();
     }
   }, [searchParams]);
@@ -50,7 +53,7 @@ export default function OrderTrackingPage() {
           TRACK YOUR ORDER
         </h1>
         <p className="text-xs text-[#666666] max-w-md mx-auto">
-          Enter your Order Number and secure tracking token from your confirmation receipt.
+          Enter your Order Number to check live fulfillment and Delivery Docket details.
         </p>
       </div>
 
@@ -63,7 +66,7 @@ export default function OrderTrackingPage() {
             </label>
             <input
               type="text"
-              placeholder="e.g. TSH-2026-123456"
+              placeholder="e.g. TSH-2026-434429"
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
               className="fashion-input uppercase font-mono"
@@ -73,15 +76,14 @@ export default function OrderTrackingPage() {
 
           <div>
             <label className="block text-[10px] font-bold text-[#666666] uppercase tracking-widest mb-1 font-mono">
-              Tracking Token *
+              Tracking Token (Optional)
             </label>
             <input
               type="text"
-              placeholder="Paste token from receipt"
+              placeholder="Paste token from receipt (Optional)"
               value={trackingToken}
               onChange={(e) => setTrackingToken(e.target.value)}
               className="fashion-input font-mono"
-              required
             />
           </div>
         </div>

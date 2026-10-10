@@ -192,16 +192,18 @@ exports.trackOrder = async (req, res) => {
   try {
     const { orderNumber, trackingToken } = req.body;
 
-    if (!orderNumber || !trackingToken) {
+    if (!orderNumber) {
       return res.status(400).json({
         success: false,
-        message: 'Order Number and Secure Tracking Token are required to look up order details.',
+        message: 'Order Number is required to look up order details.',
       });
     }
 
-    const order = await Order.findOne({ orderNumber, trackingToken });
+    const query = trackingToken ? { orderNumber, trackingToken } : { orderNumber };
+    const order = await Order.findOne(query);
+
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found with provided tracking credentials' });
+      return res.status(404).json({ success: false, message: `Order #${orderNumber} not found.` });
     }
 
     // Public sanitized order response (excludes internal POD response & payment secrets)

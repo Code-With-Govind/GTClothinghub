@@ -19,20 +19,30 @@ const ensureAdminAndInitialData = async () => {
       console.log('[Auto-Seed Success]: Admin account created (admin@gtclothinghub.com)');
     }
 
-    // Ensure default settings exist
-    const settingsCount = await Settings.countDocuments();
-    if (settingsCount === 0) {
-      await Settings.create({
+    // Ensure store settings exist & update Free Shipping + Automatic Tax Calculation
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({
         storeName: 'GT Clothing Hub Studio',
         brandName: 'GT CLOTHING HUB',
         supportEmail: 'support@gtclothinghub.com',
-        businessMode: 'PRE_REGISTRATION',
-        shippingFee: 79,
-        freeShippingThreshold: 999,
+        businessMode: 'GST_REGISTERED',
+        gstRatePercentage: 5,
+        isTaxInclusive: false,
+        shippingFee: 0,
+        freeShippingThreshold: 0,
         codEnabled: true,
         podMode: process.env.POD_MODE || 'sandbox',
       });
-      console.log('[Auto-Seed Success]: Default store settings initialized.');
+      console.log('[Auto-Seed Success]: Default store settings initialized with FREE Shipping & 5% GST Tax.');
+    } else {
+      settings.shippingFee = 0;
+      settings.freeShippingThreshold = 0;
+      settings.businessMode = 'GST_REGISTERED';
+      settings.gstRatePercentage = 5;
+      settings.isTaxInclusive = false;
+      await settings.save();
+      console.log('[Auto-Seed Success]: Updated store settings: FREE Shipping & 5% Automatic GST Tax enabled.');
     }
 
     // Ensure at least one category exists
