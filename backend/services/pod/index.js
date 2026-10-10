@@ -11,4 +11,4 @@ const getPODService = () => {
   return mockPodService;
 };
 
-module.exports = getPODService();
+module.exports = getPODService;

@@ -3,6 +3,10 @@ const PODOrder = require('../models/PODOrder');
 const AdminAuditLog = require('../models/AdminAuditLog');
 const getPODService = require('../services/pod/index');
 
+const resolvePODService = () => {
+  return typeof getPODService === 'function' ? getPODService() : getPODService;
+};
+
 // @desc    Submit Order to POD Provider
 // @route   POST /api/pod/orders/:orderId/submit
 // @access  Private/Admin
@@ -30,7 +34,7 @@ exports.submitPODOrder = async (req, res) => {
       });
     }
 
-    const podService = getPODService();
+    const podService = resolvePODService();
     const result = await podService.submitFulfillmentOrder(order);
 
     // Record POD Order
@@ -91,7 +95,7 @@ exports.autoSubmitOrderToPOD = async (order) => {
     const existingPOD = await PODOrder.findOne({ order: order._id });
     if (existingPOD) return existingPOD;
 
-    const podService = getPODService();
+    const podService = resolvePODService();
     const result = await podService.submitFulfillmentOrder(order);
 
     const podOrder = await PODOrder.create({
@@ -124,7 +128,7 @@ exports.autoSubmitOrderToPOD = async (order) => {
 // @access  Private/Admin
 exports.testPODConnection = async (req, res) => {
   try {
-    const podService = getPODService();
+    const podService = resolvePODService();
     const mode = (process.env.POD_MODE || 'mock').toLowerCase();
 
     if (mode === 'mock') {
