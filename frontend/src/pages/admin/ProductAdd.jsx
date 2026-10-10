@@ -16,6 +16,8 @@ export default function ProductAdd() {
   const [mainSection, setMainSection] = useState('Regular T-Shirts');
   const [subSection, setSubSection] = useState('Printed T-Shirts');
 
+  const [podProductId, setPodProductId] = useState('');
+
   // Multiple Images State
   const [imagesList, setImagesList] = useState([]);
   const [urlInput, setUrlInput] = useState('');
@@ -74,11 +76,12 @@ export default function ProductAdd() {
     setLoading(true);
 
     try {
+      const baseSku = podProductId ? podProductId.trim() : name.substring(0, 5).toUpperCase();
       const defaultVariants = [
-        { sku: `${name.substring(0, 5).toUpperCase()}-BLK-S`, color: 'Pitch Black', colorHex: '#121212', size: 'S', price: Number(price), podVariantId: 'POD-S' },
-        { sku: `${name.substring(0, 5).toUpperCase()}-BLK-M`, color: 'Pitch Black', colorHex: '#121212', size: 'M', price: Number(price), podVariantId: 'POD-M' },
-        { sku: `${name.substring(0, 5).toUpperCase()}-BLK-L`, color: 'Pitch Black', colorHex: '#121212', size: 'L', price: Number(price), podVariantId: 'POD-L' },
-        { sku: `${name.substring(0, 5).toUpperCase()}-BLK-XL`, color: 'Pitch Black', colorHex: '#121212', size: 'XL', price: Number(price), podVariantId: 'POD-XL' },
+        { sku: `${baseSku}-S`, color: 'Pitch Black', colorHex: '#121212', size: 'S', price: Number(price), podVariantId: `${baseSku}-S` },
+        { sku: `${baseSku}-M`, color: 'Pitch Black', colorHex: '#121212', size: 'M', price: Number(price), podVariantId: `${baseSku}-M` },
+        { sku: `${baseSku}-L`, color: 'Pitch Black', colorHex: '#121212', size: 'L', price: Number(price), podVariantId: `${baseSku}-L` },
+        { sku: `${baseSku}-XL`, color: 'Pitch Black', colorHex: '#121212', size: 'XL', price: Number(price), podVariantId: `${baseSku}-XL` },
       ];
 
       await api.post('/products', {
@@ -89,6 +92,7 @@ export default function ProductAdd() {
         category,
         mainSection,
         subSection,
+        podProductId: podProductId.trim(),
         images: imagesList,
         colors: [{ name: 'Pitch Black', hex: '#121212' }],
         sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -119,17 +123,29 @@ export default function ProductAdd() {
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-200/80 shadow-sm space-y-6">
           
-          {/* Title */}
-          <div>
-            <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5">Product Name *</label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Heavyweight Oversized Cotton Tee"
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 text-xs text-[#171717] focus:outline-none focus:border-[#111111] font-semibold"
-            />
+          {/* Title & Qikink SKU */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5">Product Name *</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Heavyweight Oversized Cotton Tee"
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 text-xs text-[#171717] focus:outline-none focus:border-[#111111] font-semibold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5 font-mono">Qikink Product ID / SKU (Optional)</label>
+              <input
+                type="text"
+                value={podProductId}
+                onChange={(e) => setPodProductId(e.target.value)}
+                placeholder="e.g. 64751292 or Qikink SKU"
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 text-xs text-[#171717] focus:outline-none focus:border-[#111111] font-mono"
+              />
+            </div>
           </div>
 
           {/* Classification Selectors */}

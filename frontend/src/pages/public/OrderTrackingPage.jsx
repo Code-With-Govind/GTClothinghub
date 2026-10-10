@@ -140,11 +140,29 @@ export default function OrderTrackingPage() {
 
             <div className="p-4 bg-[#F7F5F0] border border-[#E5E2DC] rounded-xl space-y-2">
               <PackageSearch className="w-5 h-5 text-[#111111] mx-auto" />
-              <span className="text-xs font-extrabold text-[#111111] uppercase block font-display">4. Delivery</span>
-              <span className="text-[10px] text-[#666666] font-mono block">{order.trackingNumber || 'Awaiting Tracking'}</span>
+              <span className="text-xs font-extrabold text-[#111111] uppercase block font-display">4. Docket / AWB</span>
+              <span className="text-[10px] text-[#666666] font-mono block select-all">{order.trackingNumber || 'Awaiting Dispatch'}</span>
             </div>
           </div>
 
+          {order.trackingNumber && (
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block tracking-wider">
+                  DELIVERY DOCKET / AWB NUMBER
+                </span>
+                <span className="text-base font-extrabold font-mono text-emerald-900">{order.trackingNumber}</span>
+                {order.courier && (
+                  <span className="text-xs text-emerald-700 block font-sans">
+                    Courier Partner: <strong>{order.courier}</strong>
+                  </span>
+                )}
+              </div>
+              <span className="px-3 py-1 bg-emerald-700 text-white font-mono text-[11px] font-bold rounded-lg uppercase">
+                {order.orderStatus || 'DISPATCHED'}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
