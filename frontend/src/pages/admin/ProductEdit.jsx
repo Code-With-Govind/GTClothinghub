@@ -71,7 +71,11 @@ export default function ProductEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (imagesList.length === 0) {
+    let finalImages = [...imagesList];
+    if (urlInput.trim()) {
+      finalImages.push({ url: urlInput.trim(), altText: name || 'Product Photo' });
+    }
+    if (finalImages.length === 0) {
       alert('Please attach at least 1 product photo!');
       return;
     }
@@ -83,7 +87,7 @@ export default function ProductEdit() {
         compareAtPrice: Number(compareAtPrice),
         mainSection,
         subSection,
-        images: imagesList,
+        images: finalImages,
       });
       navigate('/admin/products');
     } catch (err) {

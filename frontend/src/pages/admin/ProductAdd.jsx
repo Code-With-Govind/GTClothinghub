@@ -69,8 +69,12 @@ export default function ProductAdd() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (imagesList.length === 0) {
-      alert('Please upload at least 1 product photo!');
+    let finalImages = [...imagesList];
+    if (urlInput.trim()) {
+      finalImages.push({ url: urlInput.trim(), altText: name || 'Product Photo' });
+    }
+    if (finalImages.length === 0) {
+      alert('Please upload or paste at least 1 product photo!');
       return;
     }
     setLoading(true);
@@ -93,7 +97,7 @@ export default function ProductAdd() {
         mainSection,
         subSection,
         podProductId: podProductId.trim(),
-        images: imagesList,
+        images: finalImages,
         colors: [{ name: 'Pitch Black', hex: '#121212' }],
         sizes: ['S', 'M', 'L', 'XL', 'XXL'],
         variants: defaultVariants,
