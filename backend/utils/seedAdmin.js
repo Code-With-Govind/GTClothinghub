@@ -36,13 +36,8 @@ const ensureAdminAndInitialData = async () => {
       });
       console.log('[Auto-Seed Success]: Default store settings initialized with FREE Shipping & 5% GST Tax.');
     } else {
-      settings.shippingFee = 0;
-      settings.freeShippingThreshold = 0;
-      settings.businessMode = 'GST_REGISTERED';
-      settings.gstRatePercentage = 5;
-      settings.isTaxInclusive = false;
-      await settings.save();
-      console.log('[Auto-Seed Success]: Updated store settings: FREE Shipping & 5% Automatic GST Tax enabled.');
+      // Preserve existing store settings configured by store owner
+      console.log('[Store Settings]: Existing store settings loaded successfully.');
     }
 
     // Ensure at least one category exists

@@ -11,8 +11,12 @@ exports.getSettings = async (req, res) => {
       settings = await Settings.create({});
     }
 
-    // Public sanitized version (omits administrative flags if necessary)
-    res.json({ success: true, settings });
+    // Public sanitized version (omits sensitive proprietor financial identifiers)
+    const sanitizedSettings = settings.toObject();
+    delete sanitizedSettings.panNumber;
+    delete sanitizedSettings.__v;
+
+    res.json({ success: true, settings: sanitizedSettings });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

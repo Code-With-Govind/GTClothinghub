@@ -54,9 +54,10 @@ class PaymentService {
   verifyPaymentSignature({ razorpayOrderId, razorpayPaymentId, razorpaySignature }) {
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    // Handle mock mode
-    if (razorpayOrderId.startsWith('order_mock_')) {
-      return true;
+    // Handle mock mode only in non-production development sandbox
+    const isMockPermitted = process.env.NODE_ENV !== 'production' && process.env.RAZORPAY_MODE === 'test';
+    if (isMockPermitted && razorpayOrderId.startsWith('order_mock_')) {
+      return razorpaySignature === 'mock_signature';
     }
 
     if (!keySecret) {

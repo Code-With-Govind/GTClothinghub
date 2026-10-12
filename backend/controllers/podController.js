@@ -162,11 +162,27 @@ exports.testPODConnection = async (req, res) => {
   }
 };
 
+const verifyPODWebhookSecret = (req) => {
+  const secret = process.env.POD_WEBHOOK_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      return false; // Reject in production if secret is not set
+    }
+    return true; // Allow in development for testing
+  }
+  const provided = req.headers['x-pod-webhook-secret'] || req.headers['x-qikink-signature'] || req.query.secret;
+  return provided === secret;
+};
+
 // @desc    Qikink Tracking / Docket Status Webhook Listener
 // @route   POST /api/pod/webhook/status
-// @access  Public (Qikink Callback)
+// @access  Public (Secret Protected)
 exports.handleQikinkWebhook = async (req, res) => {
   try {
+    if (!verifyPODWebhookSecret(req)) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or missing webhook secret' });
+    }
+
     const { order_number, order_id, status, tracking_number, courier_name } = req.body;
 
     console.log('[Qikink Webhook Received]:', req.body);
@@ -211,6 +227,10 @@ exports.handleQikinkWebhook = async (req, res) => {
 // @access  Public / Secret Protected
 exports.syncQikinkProduct = async (req, res) => {
   try {
+    if (!verifyPODWebhookSecret(req)) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or missing webhook secret' });
+    }
+
     const Product = require('../models/Product');
     const Category = require('../models/Category');
     const { product_name, description, selling_price, product_id, skus, variants, images } = req.body;

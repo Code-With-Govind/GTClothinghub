@@ -5,6 +5,6 @@ const checkWebhookIdempotency = require('../middleware/idempotencyMiddleware');
 const { strictLimiter } = require('../middleware/rateLimiterMiddleware');
 
 router.post('/verify', strictLimiter, verifyPayment);
-router.post('/webhook', express.raw({ type: 'application/json' }), checkWebhookIdempotency, handleWebhook);
+router.post('/webhook', checkWebhookIdempotency, handleWebhook);
 
 module.exports = router;

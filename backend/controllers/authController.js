@@ -266,7 +266,7 @@ exports.sendEmailOtp = async (req, res) => {
     res.json({
       success: true,
       message: `Verification code sent to ${user.email}`,
-      demoOtp: process.env.NODE_ENV === 'production' ? undefined : otp,
+      demoOtp: (process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEMO_OTP === 'true') ? otp : undefined,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -347,15 +347,17 @@ exports.sendPhoneOtp = async (req, res) => {
       await user.save();
     }
 
-    console.log(`\n--- [PHONE OTP SMS SIMULATION] ---`);
-    console.log(`Phone: ${userPhone}`);
-    console.log(`OTP Code: ${otp}`);
-    console.log(`---------------------------------\n`);
+    if (process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEMO_OTP === 'true') {
+      console.log(`\n--- [PHONE OTP SMS SIMULATION] ---`);
+      console.log(`Phone: ${userPhone}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`---------------------------------\n`);
+    }
 
     res.json({
       success: true,
       message: `OTP sent to mobile number ${userPhone}`,
-      demoOtp: otp,
+      demoOtp: (process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEMO_OTP === 'true') ? otp : undefined,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -37,13 +37,20 @@ exports.createOrder = async (req, res) => {
     let subtotal = 0;
 
     for (const item of items) {
-      const product = await Product.findById(item.product || item.productId);
-      if (!product || product.status !== 'ACTIVE') {
-        return res.status(400).json({ success: false, message: `Product ${item.name} is unavailable.` });
+      if (!item.quantity || !Number.isInteger(item.quantity) || item.quantity <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid item quantity. Must be a positive integer.' });
       }
 
-      const variant = product.variants.find(
-        (v) => v.color.toLowerCase() === item.color.toLowerCase() && v.size.toUpperCase() === item.size.toUpperCase()
+      const product = await Product.findById(item.product || item.productId);
+      if (!product || product.status !== 'ACTIVE') {
+        return res.status(400).json({ success: false, message: `Product ${item.name || 'item'} is unavailable.` });
+      }
+
+      const itemColor = (item.color || '').toLowerCase();
+      const itemSize = (item.size || '').toUpperCase();
+
+      const variant = (product.variants || []).find(
+        (v) => (v.color || '').toLowerCase() === itemColor && (v.size || '').toUpperCase() === itemSize
       );
 
       const price = variant ? variant.price : product.price;
@@ -97,7 +104,9 @@ exports.createOrder = async (req, res) => {
       settings,
     });
 
-    const total = Math.round((netSubtotal + taxCalc.taxTotal + shipCalc.totalShippingCost) * 100) / 100;
+    const total = settings.isTaxInclusive
+      ? Math.round((netSubtotal + shipCalc.totalShippingCost) * 100) / 100
+      : Math.round((netSubtotal + taxCalc.taxTotal + shipCalc.totalShippingCost) * 100) / 100;
     const orderNumber = generateOrderNumber();
     const trackingToken = generateTrackingToken();
 
@@ -192,15 +201,14 @@ exports.trackOrder = async (req, res) => {
   try {
     const { orderNumber, trackingToken } = req.body;
 
-    if (!orderNumber) {
+    if (!orderNumber || !trackingToken) {
       return res.status(400).json({
         success: false,
-        message: 'Order Number is required to look up order details.',
+        message: 'Both Order Number and Tracking Token are required to look up order details.',
       });
     }
 
-    const query = trackingToken ? { orderNumber, trackingToken } : { orderNumber };
-    const order = await Order.findOne(query);
+    const order = await Order.findOne({ orderNumber, trackingToken });
 
     if (!order) {
       return res.status(404).json({ success: false, message: `Order #${orderNumber} not found.` });
@@ -275,6 +283,11 @@ exports.getOrderInvoice = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    // Security check: User must own order or be admin
+    if (req.user.role !== 'ADMIN' && String(order.user) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: 'Access denied: You do not own this order' });
+    }
 
     const settings = (await Settings.findOne()) || {};
     const invoice = invoiceService.generateInvoice(order, settings);

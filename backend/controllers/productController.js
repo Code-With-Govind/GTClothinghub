@@ -12,12 +12,16 @@ exports.getProducts = async (req, res) => {
 
     const query = { status: 'ACTIVE' };
 
+    // Helper to safely escape regex special characters
+    const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     // Search query
     if (req.query.search) {
+      const sanitized = escapeRegex(req.query.search.trim());
       query.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { tags: { $in: [new RegExp(req.query.search, 'i')] } },
+        { name: { $regex: sanitized, $options: 'i' } },
+        { description: { $regex: sanitized, $options: 'i' } },
+        { tags: { $in: [new RegExp(sanitized, 'i')] } },
       ];
     }
 
@@ -58,7 +62,7 @@ exports.getProducts = async (req, res) => {
 
     // Color Filter
     if (req.query.color) {
-      query['colors.name'] = { $regex: req.query.color, $options: 'i' };
+      query['colors.name'] = { $regex: escapeRegex(req.query.color.trim()), $options: 'i' };
     }
 
     // Sorting

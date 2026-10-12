@@ -113,17 +113,27 @@ export default function CheckoutPage() {
       const razorpayOrder = orderRes.razorpayOrder;
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
 
-      if (razorpayOrder.isMock || !window.Razorpay) {
-        console.log('[Checkout]: Simulating Sandbox Razorpay Success');
-        await api.post('/payments/verify', {
-          razorpayOrderId: razorpayOrder.id,
-          razorpayPaymentId: `pay_mock_${Date.now()}`,
-          razorpaySignature: 'mock_signature',
-          orderId: order._id,
-        });
+      if (razorpayOrder?.isMock) {
+        if (import.meta.env.DEV) {
+          console.log('[Checkout]: Simulating Sandbox Razorpay Success in DEV mode');
+          await api.post('/payments/verify', {
+            razorpayOrderId: razorpayOrder.id,
+            razorpayPaymentId: `pay_mock_${Date.now()}`,
+            razorpaySignature: 'mock_signature',
+            orderId: order._id,
+          });
 
-        clearCart();
-        navigate(`/order-success?orderNumber=${order.orderNumber}&trackingToken=${order.trackingToken}`);
+          clearCart();
+          navigate(`/order-success?orderNumber=${order.orderNumber}&trackingToken=${order.trackingToken}`);
+          return;
+        } else {
+          setErrorMessage('Payment gateway is currently in test mode. Please select Cash on Delivery.');
+          return;
+        }
+      }
+
+      if (!window.Razorpay) {
+        setErrorMessage('Payment gateway failed to load. Please disable ad-blockers, check your connection, or choose Cash on Delivery.');
         return;
       }
 

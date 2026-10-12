@@ -20,6 +20,10 @@ exports.validateCart = async (req, res) => {
     let subtotal = 0;
 
     for (const item of items) {
+      if (!item.quantity || !Number.isInteger(item.quantity) || item.quantity <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid item quantity. Must be a positive integer.' });
+      }
+
       const product = await Product.findById(item.productId || item.product);
       if (!product || product.status !== 'ACTIVE') {
         return res.status(400).json({
@@ -28,9 +32,12 @@ exports.validateCart = async (req, res) => {
         });
       }
 
+      const itemColor = (item.color || '').toLowerCase();
+      const itemSize = (item.size || '').toUpperCase();
+
       // Find matching variant
-      let matchedVariant = product.variants.find(
-        (v) => v.color.toLowerCase() === item.color.toLowerCase() && v.size.toUpperCase() === item.size.toUpperCase() && v.isActive
+      let matchedVariant = (product.variants || []).find(
+        (v) => (v.color || '').toLowerCase() === itemColor && (v.size || '').toUpperCase() === itemSize && v.isActive
       );
 
       const price = matchedVariant ? matchedVariant.price : product.price;
@@ -102,7 +109,9 @@ exports.validateCart = async (req, res) => {
       settings,
     });
 
-    const total = netSubtotal + taxCalculation.taxTotal + shippingCalculation.totalShippingCost;
+    const total = settings.isTaxInclusive
+      ? netSubtotal + shippingCalculation.totalShippingCost
+      : netSubtotal + taxCalculation.taxTotal + shippingCalculation.totalShippingCost;
 
     res.json({
       success: true,

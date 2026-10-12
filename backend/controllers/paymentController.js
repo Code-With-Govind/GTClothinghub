@@ -21,6 +21,20 @@ exports.verifyPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
+    if (order.paymentStatus === 'PAID') {
+      return res.json({
+        success: true,
+        message: 'Order is already marked as PAID.',
+        orderNumber: order.orderNumber,
+        trackingToken: order.trackingToken,
+      });
+    }
+
+    // Ensure incoming razorpayOrderId matches the one generated for this order
+    if (order.razorpayOrderId && order.razorpayOrderId !== razorpayOrderId) {
+      return res.status(400).json({ success: false, message: 'Order ID mismatch. Verification rejected.' });
+    }
+
     // Verify HMAC-SHA256 signature
     const isValid = paymentService.verifyPaymentSignature({
       razorpayOrderId,

@@ -45,11 +45,15 @@ app.use(
 // Apply General Rate Limiter
 app.use('/api/', apiLimiter);
 
-// Special raw body buffer requirement for Razorpay Webhook Signature verification
-app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
-
-// JSON & URL Body Parsers
-app.use(express.json({ limit: '10mb' }));
+// JSON & URL Body Parsers with Raw Body preservation for Webhook verification
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 
 // Mount Health Check Endpoint
