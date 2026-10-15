@@ -11,6 +11,27 @@ export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [added, setAdded] = useState(false);
+  const [showSecondary, setShowSecondary] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimerRef = React.useRef(null);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (secondaryImage) {
+      hoverTimerRef.current = setTimeout(() => {
+        setShowSecondary(true);
+      }, 2500); // 2.5 seconds hover delay before switching to second photo
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    setShowSecondary(false);
+  };
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
@@ -44,13 +65,17 @@ export default function ProductCard({ product }) {
   return (
     <div className="group bg-white rounded-xl border border-[#E5E2DC] hover:border-[#111111] transition-all duration-300 flex flex-col h-full hover:shadow-fashion-md overflow-hidden">
       {/* Product Image Container (75% visual attention) */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#F7F5F0]">
+      <div
+        className="relative aspect-[3/4] overflow-hidden bg-[#F7F5F0]"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <img
           src={primaryImage}
           alt={product.name}
-          className={`w-full h-full object-cover object-center transition-all duration-300 ${
-            secondaryImage ? 'group-hover:opacity-0 scale-100' : 'group-hover:scale-[1.02]'
-          }`}
+          className={`w-full h-full object-cover object-center transition-all duration-700 ease-out transform ${
+            isHovered ? 'scale-110' : 'scale-100'
+          } ${showSecondary ? 'opacity-0' : 'opacity-100'}`}
           loading="lazy"
         />
 
@@ -58,7 +83,9 @@ export default function ProductCard({ product }) {
           <img
             src={secondaryImage}
             alt={`${product.name} view 2`}
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-0 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-300"
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out transform ${
+              isHovered ? 'scale-110' : 'scale-100'
+            } ${showSecondary ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             loading="lazy"
           />
         )}

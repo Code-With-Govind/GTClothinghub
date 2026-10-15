@@ -79,9 +79,11 @@ export default function OrderSummary({
           </div>
         )}
 
-        <div className="flex justify-between font-mono text-[11px]">
+        <div className="flex justify-between items-center font-mono text-[11px]">
           <span>Shipping Fee</span>
-          <span className="font-bold text-[#111111]">{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
+          <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[10px]">
+            FREE EXPRESS DELIVERY
+          </span>
         </div>
 
         <div className="flex justify-between font-mono text-[11px]">

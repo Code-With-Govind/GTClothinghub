@@ -25,6 +25,20 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide complete shipping address details' });
     }
 
+    const cleanPhone = String(shippingAddress.phone || '').replace(/\D/g, '').slice(-10);
+    if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      return res.status(400).json({ success: false, message: 'Invalid phone number. Must be a valid 10-digit Indian mobile number.' });
+    }
+
+    const cleanPin = String(shippingAddress.pincode || '').replace(/\D/g, '');
+    if (!cleanPin || cleanPin.length !== 6 || !/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      return res.status(400).json({ success: false, message: 'Invalid Pincode. Must be a valid 6-digit Indian PIN code.' });
+    }
+
+    if (String(shippingAddress.street || '').trim().length < 10) {
+      return res.status(400).json({ success: false, message: 'Street address is too short. Please provide house/flat number, building, and street name (min 10 characters).' });
+    }
+
     const settings = (await Settings.findOne()) || {};
 
     // Validate COD availability

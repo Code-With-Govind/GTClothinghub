@@ -36,6 +36,44 @@ export default function CheckoutPage() {
   const [loadingCart, setLoadingCart] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [addressErrors, setAddressErrors] = useState({});
+
+  const validateAddress = () => {
+    const errs = {};
+    const nameRegex = /^[a-zA-Z\s]{3,60}$/;
+    if (!shippingAddress.fullName || !nameRegex.test(shippingAddress.fullName.trim())) {
+      errs.fullName = 'Please enter a valid full name (at least 3 alphabetic characters)';
+    }
+
+    const cleanPhone = (shippingAddress.phone || '').replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      errs.phone = 'Please enter a valid 10-digit Indian mobile number (e.g. 9876543210)';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!shippingAddress.email || !emailRegex.test(shippingAddress.email.trim().toLowerCase())) {
+      errs.email = 'Please enter a valid email address (e.g. yourname@gmail.com)';
+    }
+
+    if (!shippingAddress.street || shippingAddress.street.trim().length < 10) {
+      errs.street = 'Please provide full house/flat number, building, and street name (min 10 characters)';
+    }
+
+    if (!shippingAddress.city || shippingAddress.city.trim().length < 2) {
+      errs.city = 'Please enter a valid city name';
+    }
+
+    if (!shippingAddress.state || shippingAddress.state.trim().length < 2) {
+      errs.state = 'Please enter a valid state';
+    }
+
+    const cleanPin = (shippingAddress.pincode || '').replace(/\D/g, '');
+    if (!cleanPin || cleanPin.length !== 6 || !/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      errs.pincode = 'Please enter a valid 6-digit Indian PIN code';
+    }
+
+    return errs;
+  };
 
   // Validate cart server-side
   const validateCartServer = async (appliedCode = '') => {
@@ -66,6 +104,9 @@ export default function CheckoutPage() {
 
   const handleAddressChange = (field, value) => {
     setShippingAddress((prev) => ({ ...prev, [field]: value }));
+    if (addressErrors[field]) {
+      setAddressErrors((prev) => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleApplyCoupon = async () => {
@@ -89,6 +130,16 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+
+    // Strict Address Validation
+    const errs = validateAddress();
+    if (Object.keys(errs).length > 0) {
+      setAddressErrors(errs);
+      setErrorMessage('Please fix the highlighted invalid address information before proceeding.');
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -208,7 +259,7 @@ export default function CheckoutPage() {
         
         {/* Left: Address & Payment Method */}
         <div className="lg:col-span-2 space-y-8 bg-white border border-[#E5E2DC] p-6 sm:p-8 rounded-2xl shadow-xs">
-          <AddressForm address={shippingAddress} onChange={handleAddressChange} />
+          <AddressForm address={shippingAddress} onChange={handleAddressChange} errors={addressErrors} />
           
           <div className="pt-6 border-t border-[#E5E2DC]">
             <PaymentSelector

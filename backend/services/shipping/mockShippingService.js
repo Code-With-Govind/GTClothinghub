@@ -2,18 +2,15 @@ const ShippingInterface = require('./shippingInterface');
 
 class MockShippingService extends ShippingInterface {
   async calculateShippingFee({ items, destinationState, pincode, subtotal, paymentMethod, settings }) {
-    const freeThreshold = settings.freeShippingThreshold || 999;
-    const baseFee = settings.shippingFee || 79;
-    const codExtraFee = paymentMethod === 'COD' && settings.codEnabled ? (settings.codExtraFee || 49) : 0;
-
-    let shippingFee = subtotal >= freeThreshold ? 0 : baseFee;
+    const codExtraFee = paymentMethod === 'COD' && settings.codEnabled ? (settings.codExtraFee || 0) : 0;
+    const shippingFee = 0;
     const totalShippingCost = shippingFee + codExtraFee;
 
     return {
-      shippingFee,
+      shippingFee: 0,
       codExtraFee,
       totalShippingCost,
-      isFreeShipping: subtotal >= freeThreshold,
+      isFreeShipping: true,
       estimatedDays: '3-5 Business Days',
       courierName: 'Delhivery / BlueDart Express',
     };
