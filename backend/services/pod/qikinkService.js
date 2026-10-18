@@ -193,8 +193,12 @@ class QikinkService extends PODInterface {
             else finalSku = 'USs-Wh-M';
           }
 
-          const designUrl = item.designLink || item.design_link || item.printFile || itemImage;
-          const mockupUrl = item.mockupLink || item.mockup_link || itemImage;
+          const isValidHttpUrl = (url) => typeof url === 'string' && /^https?:\/\//i.test(url.trim());
+          const rawDesignUrl = item.designLink || item.design_link || item.printFile || itemImage;
+          const designUrl = isValidHttpUrl(rawDesignUrl) ? rawDesignUrl.trim() : defaultSandboxAsset;
+
+          const rawMockupUrl = item.mockupLink || item.mockup_link || itemImage;
+          const mockupUrl = isValidHttpUrl(rawMockupUrl) ? rawMockupUrl.trim() : defaultSandboxAsset;
 
           return {
             search_from_my_products: 0,
@@ -223,6 +227,13 @@ class QikinkService extends PODInterface {
         // If the item provides its own print designs dynamically, pass search_from_my_products: 0.
         // Otherwise use search_from_my_products: 1 to look up dashboard products by SKU.
         if (hasCustomDesign) {
+          const isValidHttpUrl = (url) => typeof url === 'string' && /^https?:\/\//i.test(url.trim());
+          const rawLiveDesign = item.designLink || item.design_link || itemImage;
+          const liveDesignUrl = isValidHttpUrl(rawLiveDesign) ? rawLiveDesign.trim() : defaultSandboxAsset;
+
+          const rawLiveMockup = item.mockupLink || item.mockup_link || itemImage;
+          const liveMockupUrl = isValidHttpUrl(rawLiveMockup) ? rawLiveMockup.trim() : defaultSandboxAsset;
+
           return {
             search_from_my_products: 0,
             sku: String(item.sku).trim(),
@@ -235,8 +246,8 @@ class QikinkService extends PODInterface {
                 width_inches: String(item.width_inches || '10'),
                 height_inches: String(item.height_inches || '10'),
                 placement_sku: item.placement_sku || 'fr',
-                design_link: item.designLink || item.design_link || itemImage,
-                mockup_link: item.mockupLink || item.mockup_link || itemImage,
+                design_link: liveDesignUrl,
+                mockup_link: liveMockupUrl,
               },
             ],
           };
