@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node dev-runner.js",
     "start": "node dev-runner.js",
+    "test:pod": "cd backend && node test-qikink.js",
     "seed": "cd backend && npm run seed",
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev"
