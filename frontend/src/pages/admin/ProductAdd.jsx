@@ -17,6 +17,45 @@ export default function ProductAdd() {
   const [subSection, setSubSection] = useState('Printed T-Shirts');
 
   const [podProductId, setPodProductId] = useState('');
+  const [apparelType, setApparelType] = useState('OvHs');
+
+  // Apparel & Color Setup for Qikink
+  const ALL_COLORS = [
+    { name: 'Pitch Black', code: 'Bk', hex: '#121212' },
+    { name: 'Pure White', code: 'Wh', hex: '#FFFFFF' },
+    { name: 'Navy Blue', code: 'Nv', hex: '#1B263B' },
+    { name: 'Vintage Gray', code: 'Gr', hex: '#4A4E69' },
+    { name: 'Bottle Green', code: 'Gn', hex: '#2D6A4F' },
+    { name: 'Maroon', code: 'Mr', hex: '#6B1D2F' },
+    { name: 'Beige / Sand', code: 'Bg', hex: '#D7C4B7' },
+  ];
+
+  const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  const [selectedColors, setSelectedColors] = useState([
+    { name: 'Pitch Black', code: 'Bk', hex: '#121212' },
+  ]);
+  const [selectedSizes, setSelectedSizes] = useState(['S', 'M', 'L', 'XL', 'XXL']);
+
+  const toggleColor = (colorObj) => {
+    if (selectedColors.some((c) => c.name === colorObj.name)) {
+      if (selectedColors.length > 1) {
+        setSelectedColors(selectedColors.filter((c) => c.name !== colorObj.name));
+      }
+    } else {
+      setSelectedColors([...selectedColors, colorObj]);
+    }
+  };
+
+  const toggleSize = (size) => {
+    if (selectedSizes.includes(size)) {
+      if (selectedSizes.length > 1) {
+        setSelectedSizes(selectedSizes.filter((s) => s !== size));
+      }
+    } else {
+      setSelectedSizes([...selectedSizes, size]);
+    }
+  };
 
   // Multiple Images State
   const [imagesList, setImagesList] = useState([]);
@@ -77,16 +116,39 @@ export default function ProductAdd() {
       alert('Please upload or paste at least 1 product photo!');
       return;
     }
+    if (selectedColors.length === 0) {
+      alert('Please select at least 1 color!');
+      return;
+    }
+    if (selectedSizes.length === 0) {
+      alert('Please select at least 1 size!');
+      return;
+    }
     setLoading(true);
 
     try {
-      const baseSku = podProductId ? podProductId.trim() : name.substring(0, 5).toUpperCase();
-      const defaultVariants = [
-        { sku: `${baseSku}-S`, color: 'Pitch Black', colorHex: '#121212', size: 'S', price: Number(price), podVariantId: `${baseSku}-S` },
-        { sku: `${baseSku}-M`, color: 'Pitch Black', colorHex: '#121212', size: 'M', price: Number(price), podVariantId: `${baseSku}-M` },
-        { sku: `${baseSku}-L`, color: 'Pitch Black', colorHex: '#121212', size: 'L', price: Number(price), podVariantId: `${baseSku}-L` },
-        { sku: `${baseSku}-XL`, color: 'Pitch Black', colorHex: '#121212', size: 'XL', price: Number(price), podVariantId: `${baseSku}-XL` },
-      ];
+      // Generate variants for each selected Color + Size
+      const generatedVariants = [];
+      selectedColors.forEach((color) => {
+        selectedSizes.forEach((size) => {
+          let variantSku = '';
+          if (apparelType === 'CUSTOM' || podProductId.trim()) {
+            const prefix = podProductId.trim() || name.substring(0, 5).toUpperCase();
+            variantSku = `${prefix}-${color.code}-${size}`;
+          } else {
+            variantSku = `${apparelType}-${color.code}-${size}`;
+          }
+
+          generatedVariants.push({
+            sku: variantSku,
+            color: color.name,
+            colorHex: color.hex,
+            size,
+            price: Number(price),
+            podVariantId: variantSku,
+          });
+        });
+      });
 
       await api.post('/products', {
         name,
@@ -96,11 +158,11 @@ export default function ProductAdd() {
         category,
         mainSection,
         subSection,
-        podProductId: podProductId.trim(),
+        podProductId: podProductId.trim() || apparelType,
         images: finalImages,
-        colors: [{ name: 'Pitch Black', hex: '#121212' }],
-        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-        variants: defaultVariants,
+        colors: selectedColors.map((c) => ({ name: c.name, hex: c.hex })),
+        sizes: selectedSizes,
+        variants: generatedVariants,
         flags: { isFeatured, isBestSeller, isNewArrival },
       });
 
@@ -141,14 +203,97 @@ export default function ProductAdd() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5 font-mono">Qikink Product ID / SKU (Optional)</label>
+              <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5 font-mono">Qikink Product ID / Custom SKU (Optional)</label>
               <input
                 type="text"
                 value={podProductId}
                 onChange={(e) => setPodProductId(e.target.value)}
-                placeholder="e.g. 64751292 or Qikink SKU"
+                placeholder="e.g. 64751292 or Custom Code"
                 className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 text-xs text-[#171717] focus:outline-none focus:border-[#111111] font-mono"
               />
+            </div>
+          </div>
+
+          {/* QIKINK APPAREL & ATTRIBUTES SPECIFICATION */}
+          <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-200 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-[#C8A96B] tracking-widest uppercase font-mono block">POD Printing Specs</span>
+                <h3 className="text-xs font-black text-[#171717] uppercase">Garment Apparel Type & Available Colors</h3>
+              </div>
+              <span className="text-[10px] font-mono bg-white border border-neutral-200 px-2.5 py-1 rounded-md text-neutral-600 font-bold">
+                Qikink Catalog Verified
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5">Base Garment Type *</label>
+                <select
+                  value={apparelType}
+                  onChange={(e) => setApparelType(e.target.value)}
+                  className="w-full bg-white border border-neutral-200 rounded-xl px-4 py-3 text-xs text-[#171717] focus:outline-none focus:border-[#111111] font-bold"
+                >
+                  <option value="OvHs">Oversized Heavyweight T-Shirt (240 GSM) - [OvHs]</option>
+                  <option value="RnHs">Round Neck Classic T-Shirt (180 GSM) - [RnHs]</option>
+                  <option value="HDs">Unisex Pullover Hoodie (350 GSM) - [HDs]</option>
+                  <option value="USs">Unisex Crewneck Sweatshirt (320 GSM) - [USs]</option>
+                  <option value="CUSTOM">Custom SKU / Specific Product ID</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5">Available Sizes</label>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {AVAILABLE_SIZES.map((s) => {
+                    const isSelected = selectedSizes.includes(s);
+                    return (
+                      <button
+                        type="button"
+                        key={s}
+                        onClick={() => toggleSize(s)}
+                        className={`px-3 py-1.5 text-xs font-bold uppercase rounded-lg border transition-all ${
+                          isSelected
+                            ? 'bg-[#111111] text-white border-[#111111]'
+                            : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-400'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Color Multi-Selector */}
+            <div>
+              <label className="block text-xs font-bold text-[#171717] uppercase mb-1.5">
+                Available Colors ({selectedColors.length} Selected) *
+              </label>
+              <div className="flex flex-wrap gap-2.5 pt-1">
+                {ALL_COLORS.map((col) => {
+                  const isSelected = selectedColors.some((c) => c.name === col.name);
+                  return (
+                    <button
+                      type="button"
+                      key={col.name}
+                      onClick={() => toggleColor(col)}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
+                        isSelected
+                          ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm'
+                          : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400'
+                      }`}
+                    >
+                      <span
+                        className="w-3.5 h-3.5 rounded-full border border-black/20"
+                        style={{ backgroundColor: col.hex }}
+                      />
+                      <span>{col.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
