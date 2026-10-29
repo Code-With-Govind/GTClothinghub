@@ -78,6 +78,26 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const resendVerification = async (email) => {
+    return await api.post('/auth/resend-verification', { email });
+  };
+
+  const verifyEmailToken = async (token) => {
+    const res = await api.post(`/auth/verify-email/${token}`);
+    if (res.user) {
+      setUser((prev) => (prev ? { ...prev, isEmailVerified: true } : res.user));
+    }
+    return res;
+  };
+
+  const forgotPassword = async (email) => {
+    return await api.post('/auth/forgot-password', { email });
+  };
+
+  const resetPassword = async (token, password) => {
+    return await api.post(`/auth/reset-password/${token}`, { password });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -92,6 +112,10 @@ export const AuthProvider = ({ children }) => {
         verifyEmailOtp,
         sendPhoneOtp,
         verifyPhoneOtp,
+        resendVerification,
+        verifyEmailToken,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {children}

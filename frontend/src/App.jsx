@@ -31,6 +31,7 @@ import LoginPage from './pages/public/LoginPage';
 import RegisterPage from './pages/public/RegisterPage';
 import ForgotPasswordPage from './pages/public/ForgotPasswordPage';
 import ResetPasswordPage from './pages/public/ResetPasswordPage';
+import VerifyEmailPage from './pages/public/VerifyEmailPage';
 import NotFoundPage from './pages/public/NotFoundPage';
 
 
@@ -90,6 +91,8 @@ export default function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
 
                 {/* USER ACCOUNT PROTECTED ROUTES */}
                 <Route path="/account" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />

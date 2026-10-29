@@ -31,10 +31,11 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const heroProductImage = featuredDrops[0]?.images?.[0]?.url || 
+  const heroProduct = featuredDrops[0];
+  const heroProductImage = heroProduct?.images?.[0]?.url ||
     'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1000&auto=format&fit=crop&q=80';
 
-  const collectionProductImage = featuredDrops[1]?.images?.[0]?.url || 
+  const collectionProductImage = featuredDrops[1]?.images?.[0]?.url ||
     'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&auto=format&fit=crop&q=80';
 
   return (
@@ -42,56 +43,127 @@ export default function Home() {
       <SEO title="GT Clothing Hub | Modern Streetwear & T-Shirts" />
 
       {/* 10 — HERO SECTION */}
-      <section className="relative pt-8 pb-16 lg:py-20 border-b border-[#E5E2DC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          
+      <section className="relative pt-6 pb-12 sm:pt-8 sm:pb-16 lg:py-20 border-b border-[#E5E2DC] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
           {/* Left Column Content */}
           <div className="lg:col-span-6 space-y-6">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#6F7358]">
-              GT CLOTHING HUB
-            </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6F7358]/10 border border-[#6F7358]/20 text-[#6F7358] text-[11px] font-mono font-bold tracking-widest uppercase">
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span>GT CLOTHING HUB • AUTHENTIC STREETWEAR</span>
+            </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold uppercase font-display leading-[0.95] text-[#111111] tracking-tight">
               WEAR YOUR <br />
-              OWN RULES.
+              <span className="text-[#111111]">OWN RULES.</span>
             </h1>
 
-            <p className="max-w-lg text-sm sm:text-base text-[#666666] leading-relaxed font-medium">
-              Modern everyday pieces designed for people who don't follow the usual rules. Heavyweight 240 GSM cotton, bio-washed feel, and direct-to-garment graphic art.
+            <p className="max-w-lg text-sm sm:text-base text-[#555555] leading-relaxed font-normal">
+              Heavyweight 240 GSM drop-shoulder tees, bio-washed cotton blanks, and precision direct-to-garment graphics engineered for everyday comfort.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
               <Link
                 to="/shop"
-                className="btn-primary"
+                className="btn-primary flex items-center justify-center gap-2 shadow-sm text-center"
               >
-                SHOP COLLECTION <ArrowRight className="w-4 h-4" />
+                <span>SHOP COLLECTION</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/shop?isNewArrival=true"
-                className="btn-outline"
+                className="btn-outline flex items-center justify-center gap-2 text-center"
               >
-                EXPLORE
+                <span>EXPLORE NEW DROPS</span>
               </Link>
+            </div>
+
+            {/* Quality and Craftsmanship Indicators */}
+            <div className="pt-6 border-t border-[#E5E2DC] grid grid-cols-3 gap-3 sm:gap-6">
+              <div>
+                <p className="text-xs sm:text-sm font-bold font-display text-[#111111] uppercase tracking-wide">240 GSM</p>
+                <p className="text-[11px] text-[#777777] font-medium leading-tight mt-0.5">Combed Cotton</p>
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-bold font-display text-[#111111] uppercase tracking-wide">BOXY FIT</p>
+                <p className="text-[11px] text-[#777777] font-medium leading-tight mt-0.5">Drop Shoulder</p>
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-bold font-display text-[#111111] uppercase tracking-wide">PAN-INDIA</p>
+                <p className="text-[11px] text-[#777777] font-medium leading-tight mt-0.5">Fast Delivery</p>
+              </div>
             </div>
           </div>
 
           {/* Right Column Visual Showcase */}
-          <div className="lg:col-span-6">
-            <div className="relative aspect-[4/5] bg-white rounded-2xl border border-[#E5E2DC] overflow-hidden shadow-fashion-lg group">
+          <div className="lg:col-span-6 w-full">
+            <div className="relative aspect-[4/5] sm:aspect-square lg:aspect-[4/5] max-h-[580px] w-full mx-auto bg-gradient-to-b from-[#F2EFE9] to-[#E5E0D6] rounded-2xl border border-[#E5E2DC] overflow-hidden shadow-fashion-lg flex items-center justify-center p-6 sm:p-10 group">
+
+              {/* Category / Badge in Top Left */}
+              <div className="absolute top-4 left-4 z-10">
+                <span className="inline-block px-2.5 py-1 rounded bg-[#111111]/85 backdrop-blur-sm text-[#F7F5F0] font-mono text-[10px] uppercase tracking-widest font-bold shadow-sm">
+                  {heroProduct?.mainSection || 'SIGNATURE DROP'}
+                </span>
+              </div>
+
+              {/* Main Product Visual — Never cropped, eagerly loaded */}
               <img
                 src={heroProductImage}
-                alt="GT Streetwear Editorial Visual"
-                className="w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-500"
+                alt={heroProduct?.name ? `${heroProduct.name} - GT Clothing Hub Streetwear` : "GT Clothing Hub Heavyweight Streetwear Collection"}
+                loading="eager"
+                fetchPriority="high"
+                className="w-full h-full object-contain object-center drop-shadow-xl motion-safe:group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1000&auto=format&fit=crop&q=80';
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-transparent to-transparent p-6 flex flex-col justify-end">
-                <span className="text-[10px] font-mono font-bold text-[#F7F5F0] uppercase tracking-widest">
-                  NEW SEASON DROP
-                </span>
-                <p className="text-white text-base font-bold uppercase tracking-wide">
-                  Heavyweight 240 GSM Silhouette
-                </p>
+
+              {/* Product Badge Card at Bottom */}
+              <div className="absolute inset-x-4 bottom-4 z-10">
+                {heroProduct?.slug ? (
+                  <Link
+                    to={`/product/${heroProduct.slug}`}
+                    className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-white/95 backdrop-blur-md border border-[#E5E2DC] shadow-md hover:border-[#111111] transition-all group/card"
+                    title={`View ${heroProduct.name}`}
+                  >
+                    <div className="min-w-0 pr-3">
+                      <span className="text-[10px] font-mono font-bold text-[#6F7358] uppercase tracking-wider block">
+                        FEATURED DROP
+                      </span>
+                      <p className="text-xs sm:text-sm font-bold text-[#111111] uppercase tracking-tight truncate">
+                        {heroProduct.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs sm:text-sm font-extrabold text-[#111111]">
+                        ₹{heroProduct.price?.toLocaleString('en-IN')}
+                      </span>
+                      <div className="w-7 h-7 rounded-full bg-[#111111] text-white flex items-center justify-center group-hover/card:bg-[#6F7358] transition-colors">
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-white/95 backdrop-blur-md border border-[#E5E2DC] shadow-md">
+                    <div>
+                      <span className="text-[10px] font-mono font-bold text-[#6F7358] uppercase tracking-wider block">
+                        AUTHENTIC EDITION
+                      </span>
+                      <p className="text-xs sm:text-sm font-bold text-[#111111] uppercase tracking-tight">
+                        Heavyweight 240 GSM Silhouette
+                      </p>
+                    </div>
+                    <Link
+                      to="/shop"
+                      className="text-xs font-bold text-[#111111] uppercase flex items-center gap-1 hover:text-[#6F7358] transition-colors"
+                    >
+                      EXPLORE <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                )}
               </div>
+
             </div>
           </div>
 
@@ -102,7 +174,7 @@ export default function Home() {
       <section className="py-8 bg-white border-b border-[#E5E2DC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            
+
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-[#111111] shrink-0" />
               <div>
@@ -186,7 +258,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
+
             {/* Block 1: MINIMAL */}
             <Link
               to="/shop?subSection=Plain+T-Shirts"
@@ -273,7 +345,7 @@ export default function Home() {
           <span className="text-xs font-mono font-bold text-[#6F7358] uppercase tracking-widest">
             BRAND MANIFESTO
           </span>
-          
+
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase font-display tracking-tight text-white leading-tight">
             MORE THAN A T-SHIRT.
           </h2>
@@ -296,7 +368,7 @@ export default function Home() {
       {/* 16 — FEATURED COLLECTION */}
       <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white border border-[#E5E2DC] rounded-2xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center shadow-fashion-sm">
-          
+
           {/* 60% Image */}
           <div className="lg:col-span-7 aspect-[4/3] rounded-xl overflow-hidden bg-[#F7F5F0]">
             <img
@@ -346,7 +418,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            
+
             <div className="space-y-3 p-6 bg-[#F7F5F0] rounded-xl border border-[#E5E2DC]">
               <span className="text-xs font-mono font-bold text-[#6F7358]">01 —</span>
               <h3 className="font-extrabold text-sm uppercase text-[#111111] font-display">QUALITY</h3>

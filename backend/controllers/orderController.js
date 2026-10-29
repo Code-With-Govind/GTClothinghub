@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
@@ -169,6 +170,7 @@ exports.createOrder = async (req, res) => {
       success: true,
       order,
       razorpayOrder,
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -192,14 +194,21 @@ exports.getMyOrders = async (req, res) => {
 // @access  Private (Owner / Admin)
 exports.getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+    const order = isObjectId
+      ? await Order.findById(req.params.id).populate('user', 'name email')
+      : await Order.findOne({ orderNumber: req.params.id }).populate('user', 'name email');
+
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
     // Security check: User must own order or be admin
-    if (req.user.role !== 'ADMIN' && String(order.user) !== String(req.user._id)) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
+    const orderUserId = order.user?._id ? order.user._id.toString() : (order.user ? order.user.toString() : null);
+    const requestUserId = req.user?._id ? req.user._id.toString() : null;
+
+    if (req.user.role !== 'ADMIN' && (!orderUserId || orderUserId !== requestUserId)) {
+      return res.status(403).json({ success: false, message: 'Access denied: You do not have permission to view this order.' });
     }
 
     res.json({ success: true, order });
@@ -257,34 +266,153 @@ exports.trackOrder = async (req, res) => {
 
 // @desc    Request return / refund
 // @route   POST /api/orders/:id/return
-// @access  Private
+// @access  Private (Owner / Admin)
 exports.requestReturn = async (req, res) => {
   try {
-    const { reason, details } = req.body;
-    const order = await Order.findById(req.params.id);
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+    const existingOrder = isObjectId
+      ? await Order.findById(req.params.id)
+      : await Order.findOne({ orderNumber: req.params.id });
 
-    if (!order) {
+    if (!existingOrder) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    if (String(order.user) !== String(req.user._id)) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
+    const orderUserId = existingOrder.user?._id ? existingOrder.user._id.toString() : (existingOrder.user ? existingOrder.user.toString() : null);
+    const requestUserId = req.user?._id ? req.user._id.toString() : null;
+
+    if (req.user.role !== 'ADMIN' && (!orderUserId || orderUserId !== requestUserId)) {
+      return res.status(403).json({ success: false, message: 'Access denied: You do not have permission to modify this order.' });
     }
 
-    if (order.orderStatus !== 'DELIVERED') {
+    if (existingOrder.orderStatus !== 'DELIVERED') {
       return res.status(400).json({ success: false, message: 'Return requests can only be placed for delivered orders.' });
     }
 
-    order.orderStatus = 'RETURN_REQUESTED';
-    order.returnRequest = {
-      reason,
-      details,
-      requestedAt: new Date(),
-      status: 'PENDING',
-    };
+    if (existingOrder.returnRequest?.status && existingOrder.returnRequest.status !== 'NONE') {
+      return res.status(409).json({
+        success: false,
+        message: `A return request has already been submitted for this order (Status: ${existingOrder.returnRequest.status}). Duplicate requests are not permitted.`,
+      });
+    }
 
-    await order.save();
-    res.json({ success: true, message: 'Return request submitted successfully', order });
+    const { reason, details, items } = req.body;
+    const validReasons = [
+      'Defective Product / Manufacturing Defect',
+      'Damaged Product / Damaged in Transit',
+    ];
+
+    const sanitizedReason = (reason || '').trim();
+    if (!validReasons.includes(sanitizedReason)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a valid return reason conforming to store policy: "Defective Product / Manufacturing Defect" or "Damaged Product / Damaged in Transit".',
+      });
+    }
+
+    const sanitizedDetails = (details || '').trim().slice(0, 1000);
+
+    // 7-day eligibility check or legacy manual review flagging
+    let isLegacyReview = false;
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+    if (existingOrder.deliveredAt) {
+      const elapsed = Date.now() - new Date(existingOrder.deliveredAt).getTime();
+      if (elapsed > SEVEN_DAYS_MS) {
+        return res.status(400).json({
+          success: false,
+          message: 'The 7-day return window from the delivery date has expired for this order as per store policy.',
+        });
+      }
+    } else {
+      isLegacyReview = true;
+    }
+
+    // Item selection and bounds validation against original order items
+    let validatedItems = [];
+    if (Array.isArray(items) && items.length > 0) {
+      for (const it of items) {
+        const originalItem = existingOrder.items.id(it.orderItemId) ||
+          existingOrder.items.find((orig) => orig._id.toString() === it.orderItemId || orig.sku === it.sku);
+
+        if (!originalItem) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid order item specified: ${it.orderItemId || it.sku}`,
+          });
+        }
+
+        const reqQty = Number(it.quantity) || 1;
+        if (!Number.isInteger(reqQty) || reqQty < 1 || reqQty > originalItem.quantity) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid return quantity for item "${originalItem.name}". Must be between 1 and ${originalItem.quantity}.`,
+          });
+        }
+
+        validatedItems.push({
+          orderItemId: originalItem._id.toString(),
+          product: originalItem.product,
+          name: originalItem.name,
+          sku: originalItem.sku,
+          color: originalItem.color,
+          size: originalItem.size,
+          image: originalItem.image,
+          unitPrice: originalItem.price,
+          quantity: reqQty,
+          reason: (it.reason || sanitizedReason).trim().slice(0, 200),
+        });
+      }
+    } else {
+      validatedItems = existingOrder.items.map((orig) => ({
+        orderItemId: orig._id.toString(),
+        product: orig.product,
+        name: orig.name,
+        sku: orig.sku,
+        color: orig.color,
+        size: orig.size,
+        image: orig.image,
+        unitPrice: orig.price,
+        quantity: orig.quantity,
+        reason: sanitizedReason,
+      }));
+    }
+
+    // Atomic concurrency lock via findOneAndUpdate
+    const updatedOrder = await Order.findOneAndUpdate(
+      {
+        _id: existingOrder._id,
+        orderStatus: 'DELIVERED',
+        'returnRequest.status': { $in: ['NONE', null] },
+      },
+      {
+        $set: {
+          orderStatus: 'RETURN_REQUESTED',
+          'returnRequest.status': 'PENDING',
+          'returnRequest.reason': sanitizedReason,
+          'returnRequest.details': sanitizedDetails,
+          'returnRequest.items': validatedItems,
+          'returnRequest.isLegacyReview': isLegacyReview,
+          'returnRequest.requestedAt': new Date(),
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(409).json({
+        success: false,
+        message: 'A return request is already active or in progress for this order. Duplicate requests are rejected.',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: isLegacyReview
+        ? 'Return request received and queued for manual delivery date verification by our studio team.'
+        : 'Return request submitted successfully. Our team will review your request.',
+      order: updatedOrder,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -295,11 +423,18 @@ exports.requestReturn = async (req, res) => {
 // @access  Private
 exports.getOrderInvoice = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+    const order = isObjectId
+      ? await Order.findById(req.params.id)
+      : await Order.findOne({ orderNumber: req.params.id });
+
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
     // Security check: User must own order or be admin
-    if (req.user.role !== 'ADMIN' && String(order.user) !== String(req.user._id)) {
+    const orderUserId = order.user?._id ? order.user._id.toString() : (order.user ? order.user.toString() : null);
+    const requestUserId = req.user?._id ? req.user._id.toString() : null;
+
+    if (req.user.role !== 'ADMIN' && (!orderUserId || orderUserId !== requestUserId)) {
       return res.status(403).json({ success: false, message: 'Access denied: You do not own this order' });
     }
 

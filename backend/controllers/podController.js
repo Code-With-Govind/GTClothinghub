@@ -27,10 +27,10 @@ exports.submitPODOrder = async (req, res) => {
 
     // Prevent duplicate submission
     const existingPOD = await PODOrder.findOne({ order: order._id });
-    if (existingPOD) {
+    if (existingPOD || order.podOrderId) {
       return res.status(400).json({
         success: false,
-        message: `Order #${order.orderNumber} has already been submitted to POD provider. (POD ID: ${existingPOD.podOrderId})`,
+        message: `Order #${order.orderNumber} has already been submitted to POD provider. (POD ID: ${existingPOD ? existingPOD.podOrderId : order.podOrderId})`,
       });
     }
 
@@ -92,33 +92,54 @@ exports.getPODOrders = async (req, res) => {
 // Helper function for automatic POD submission on payment completion / COD order
 exports.autoSubmitOrderToPOD = async (order) => {
   try {
+    if (!order || !order._id) return null;
+
+    // Atomic lock: Only proceed if order has not been submitted and is not currently submitting
+    const orderToSubmit = await Order.findOneAndUpdate(
+      {
+        _id: order._id,
+        podOrderId: { $in: ['', null] },
+        podStatus: { $nin: ['SUBMITTED', 'SUBMITTING', 'PROCESSING', 'SHIPPED', 'DELIVERED'] },
+      },
+      { $set: { podStatus: 'SUBMITTING' } },
+      { new: true }
+    );
+
+    if (!orderToSubmit) {
+      console.log(`[Auto POD]: Order #${order.orderNumber} is already submitted or in-flight. Skipping duplicate call.`);
+      return await PODOrder.findOne({ order: order._id });
+    }
+
     const existingPOD = await PODOrder.findOne({ order: order._id });
     if (existingPOD) return existingPOD;
 
     const podService = resolvePODService();
-    const result = await podService.submitFulfillmentOrder(order);
+    const result = await podService.submitFulfillmentOrder(orderToSubmit);
 
     const podOrder = await PODOrder.create({
-      order: order._id,
-      podProvider: result.podProvider || 'MOCK_POD',
+      order: orderToSubmit._id,
+      podProvider: result.podProvider || 'QIKINK',
       podOrderId: result.podOrderId,
-      idempotencyKey: `pod_key_${order.orderNumber}`,
+      idempotencyKey: `pod_key_${orderToSubmit.orderNumber}`,
       podStatus: result.status || 'SUBMITTED',
       trackingNumber: result.trackingNumber || '',
       courier: result.courier || '',
       providerResponse: result.rawResponse || {},
     });
 
-    order.orderStatus = 'FULFILLMENT_PENDING';
-    order.podOrderId = result.podOrderId;
-    order.podStatus = result.status;
-    if (result.trackingNumber) order.trackingNumber = result.trackingNumber;
-    if (result.courier) order.courier = result.courier;
-    await order.save();
+    orderToSubmit.orderStatus = 'FULFILLMENT_PENDING';
+    orderToSubmit.podOrderId = result.podOrderId;
+    orderToSubmit.podStatus = result.status || 'SUBMITTED';
+    if (result.trackingNumber) orderToSubmit.trackingNumber = result.trackingNumber;
+    if (result.courier) orderToSubmit.courier = result.courier;
+    await orderToSubmit.save();
 
-    console.log(`[Auto POD Submission Success]: Order #${order.orderNumber} pushed to ${result.podProvider}`);
+    console.log(`[Auto POD Submission Success]: Order #${orderToSubmit.orderNumber} pushed to ${result.podProvider} (POD ID: ${result.podOrderId})`);
     return podOrder;
   } catch (error) {
+    if (order && order._id) {
+      await Order.findByIdAndUpdate(order._id, { $set: { podStatus: 'SUBMISSION_FAILED' } });
+    }
     console.error(`[Auto POD Submission Error]: Order #${order.orderNumber} - ${error.message}`);
   }
 };
@@ -191,7 +212,13 @@ exports.handleQikinkWebhook = async (req, res) => {
     console.log('[Qikink Webhook Received]:', body);
 
     const query = [];
-    if (orderNum) query.push({ orderNumber: orderNum });
+    if (orderNum) {
+      query.push({ orderNumber: String(orderNum).trim() });
+      const stripped = String(orderNum).replace(/[^a-zA-Z0-9]/g, '');
+      if (stripped.length >= 8) {
+        query.push({ orderNumber: new RegExp(stripped.split('').join('-?'), 'i') });
+      }
+    }
     if (qikinkOrderId) query.push({ podOrderId: qikinkOrderId });
 
     if (query.length === 0) {
@@ -211,6 +238,9 @@ exports.handleQikinkWebhook = async (req, res) => {
       const upperStatus = String(status).toUpperCase();
       if (['SHIPPED', 'DISPATCHED', 'DELIVERED', 'IN_TRANSIT', 'CANCELLED', 'RTO'].includes(upperStatus)) {
         order.orderStatus = upperStatus === 'IN_TRANSIT' ? 'SHIPPED' : upperStatus;
+        if (upperStatus === 'DELIVERED' && !order.deliveredAt) {
+          order.deliveredAt = new Date();
+        }
       }
     }
 

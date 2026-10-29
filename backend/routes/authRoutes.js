@@ -8,6 +8,8 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
+  verifyEmailToken,
+  resendVerification,
   sendEmailOtp,
   verifyEmailOtp,
   sendPhoneOtp,
@@ -23,6 +25,11 @@ router.put('/profile', protect, updateProfile);
 router.put('/change-password', protect, changePassword);
 router.post('/forgot-password', strictLimiter, forgotPassword);
 router.post('/reset-password/:resetToken', strictLimiter, resetPassword);
+
+// Email Verification Link Routes (cryptographically secure single-use token)
+router.get('/verify-email/:token', verifyEmailToken);
+router.post('/verify-email/:token', strictLimiter, verifyEmailToken);
+router.post('/resend-verification', strictLimiter, resendVerification);
 
 // OTP Verification Routes
 router.post('/send-email-otp', sendEmailOtp);

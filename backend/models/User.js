@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+    lastVerificationEmailSentAt: Date,
+    passwordChangedAt: Date,
     emailOtp: String,
     emailOtpExpire: Date,
     phoneOtp: String,
@@ -52,6 +56,16 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+
+// Check if password was changed after token was issued
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
 
 // Encrypt password using bcrypt before saving

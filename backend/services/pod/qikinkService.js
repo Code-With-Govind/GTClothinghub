@@ -6,20 +6,25 @@ class QikinkService extends PODInterface {
     super();
     this.cachedToken = null;
     this.tokenExpiry = null;
+    this.cachedMode = null;
   }
 
   isSandbox() {
     if (process.env.QIKINK_SANDBOX_MODE !== undefined) {
-      return process.env.QIKINK_SANDBOX_MODE === 'true';
+      return String(process.env.QIKINK_SANDBOX_MODE).trim().toLowerCase() === 'true';
     }
-    const mode = (process.env.POD_MODE || 'sandbox').toLowerCase();
-    return mode !== 'live';
+    const mode = (process.env.POD_MODE || process.env.POD_PROVIDER || 'sandbox').trim().toLowerCase();
+    return mode !== 'live' && mode !== 'production';
   }
 
   getApiUrl() {
+    const customUrl = (process.env.POD_API_URL || '').replace(/\/+$/, '').replace(/\/v1$/, '');
     if (this.isSandbox()) {
-      const customUrl = (process.env.POD_API_URL || '').replace(/\/+$/, '').replace(/\/v1$/, '');
       return customUrl || 'https://sandbox.qikink.com';
+    }
+    // In live mode, default to official live endpoint, but allow custom URL if not explicitly sandbox
+    if (customUrl && !customUrl.includes('sandbox.qikink.com')) {
+      return customUrl;
     }
     return 'https://api.qikink.com';
   }
@@ -27,6 +32,7 @@ class QikinkService extends PODInterface {
   getCredentials() {
     const isSandbox = this.isSandbox();
     const apiKey = (
+      (isSandbox ? process.env.QIKINK_SANDBOX_CLIENT_ID : process.env.QIKINK_LIVE_CLIENT_ID) ||
       process.env.QIKINK_CLIENT_ID ||
       process.env.POD_API_KEY ||
       process.env.POD_CLIENT_ID ||
@@ -43,6 +49,7 @@ class QikinkService extends PODInterface {
       ).trim();
     } else {
       apiSecret = (
+        process.env.QIKINK_LIVE_SECRET ||
         process.env.QIKINK_CLIENT_SECRET ||
         process.env.POD_API_SECRET ||
         process.env.POD_CLIENT_SECRET ||
@@ -54,7 +61,8 @@ class QikinkService extends PODInterface {
   }
 
   async getAccessToken(forceRefresh = false) {
-    if (!forceRefresh && this.cachedToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
+    const currentMode = this.isSandbox() ? 'sandbox' : 'live';
+    if (!forceRefresh && this.cachedToken && this.tokenExpiry && this.cachedMode === currentMode && Date.now() < this.tokenExpiry) {
       return this.cachedToken;
     }
 
@@ -62,7 +70,7 @@ class QikinkService extends PODInterface {
     const apiUrl = this.getApiUrl();
 
     if (!apiKey || !apiSecret) {
-      throw new Error('Qikink POD API credentials (Client ID / Secret) are missing in environment variables.');
+      throw new Error(`Qikink POD API credentials (Client ID / Secret) are missing in environment variables for ${currentMode.toUpperCase()} mode.`);
     }
 
     try {
@@ -83,6 +91,7 @@ class QikinkService extends PODInterface {
       }
 
       this.cachedToken = token;
+      this.cachedMode = currentMode;
       const expiresInSec = Number(response.data?.expires_in) || 3600;
       // Refresh 5 minutes before actual expiry
       this.tokenExpiry = Date.now() + Math.max(300, expiresInSec - 300) * 1000;
@@ -93,6 +102,7 @@ class QikinkService extends PODInterface {
       console.error('[Qikink Auth Diagnostic]:', {
         status,
         url: `${apiUrl}/api/token`,
+        mode: currentMode,
         message: error.response?.data?.error || error.response?.data?.message || error.message,
       });
       throw new Error(`Qikink authentication failed (HTTP ${status ?? 'NO_RESPONSE'}). Check backend logs.`);
@@ -174,7 +184,7 @@ class QikinkService extends PODInterface {
         const itemImage =
           item.image ||
           (item.product && item.product.images && item.product.images[0]?.url) ||
-          defaultSandboxAsset;
+          (isSandbox ? defaultSandboxAsset : '');
 
         const hasCustomDesign = Boolean(item.designLink || item.design_link || item.printFile);
 
@@ -224,25 +234,33 @@ class QikinkService extends PODInterface {
         }
 
         // In Live mode:
-        // If the item provides its own print designs dynamically, pass search_from_my_products: 0.
-        // Otherwise use search_from_my_products: 1 to look up dashboard products by SKU.
+        // 1. Resolve genuine item SKU (use variant sku or fall back to podVariantId)
+        const liveSku = String(item.sku || item.podVariantId || '').trim();
+        if (!liveSku) {
+          throw new Error(`Cannot submit order to Qikink: Item '${item.name || 'unnamed'}' is missing a valid SKU.`);
+        }
+
+        // If the item provides its own print designs dynamically (custom design order)
         if (hasCustomDesign) {
           const isValidHttpUrl = (url) => typeof url === 'string' && /^https?:\/\//i.test(url.trim());
-          const rawLiveDesign = item.designLink || item.design_link || itemImage;
-          const liveDesignUrl = isValidHttpUrl(rawLiveDesign) ? rawLiveDesign.trim() : defaultSandboxAsset;
+          const rawLiveDesign = item.designLink || item.design_link || item.printFile || itemImage;
+          const liveDesignUrl = isValidHttpUrl(rawLiveDesign) ? rawLiveDesign.trim() : '';
+          if (!liveDesignUrl) {
+            throw new Error(`Cannot submit custom item '${item.name || liveSku}' to Qikink: Valid design artwork URL is required.`);
+          }
 
           const rawLiveMockup = item.mockupLink || item.mockup_link || itemImage;
-          const liveMockupUrl = isValidHttpUrl(rawLiveMockup) ? rawLiveMockup.trim() : defaultSandboxAsset;
+          const liveMockupUrl = isValidHttpUrl(rawLiveMockup) ? rawLiveMockup.trim() : liveDesignUrl;
 
           return {
             search_from_my_products: 0,
-            sku: String(item.sku).trim(),
+            sku: liveSku,
             quantity: String(item.quantity || 1),
             price: String(item.price || 0),
             print_type_id: item.print_type_id || 1,
             designs: [
               {
-                design_code: item.design_code || `Design-${item.sku}`,
+                design_code: item.design_code || `Design-${liveSku}`,
                 width_inches: String(item.width_inches || '10'),
                 height_inches: String(item.height_inches || '10'),
                 placement_sku: item.placement_sku || 'fr',
@@ -253,9 +271,10 @@ class QikinkService extends PODInterface {
           };
         }
 
+        // Standard Live Store Catalog item: Look up in merchant's Qikink "My Products" by SKU
         return {
           search_from_my_products: 1,
-          sku: String(item.sku).trim(),
+          sku: liveSku,
           quantity: String(item.quantity || 1),
           price: String(item.price || 0),
         };
@@ -290,18 +309,18 @@ class QikinkService extends PODInterface {
         }
       }
 
-      if (
+      const orderId = response.data?.order_id || response.data?.qikink_order_id || response.data?.id;
+      const isSuccessStatus =
         response.data?.status_code === '200' ||
         response.data?.status_code === 200 ||
-        response.data?.order_id ||
-        response.data?.qikink_order_id ||
         response.data?.status === 'success' ||
-        response.data?.success === true
-      ) {
+        response.data?.success === true;
+
+      if (isSuccessStatus && orderId) {
         return {
           success: true,
           podProvider: 'QIKINK',
-          podOrderId: String(response.data?.order_id || response.data?.qikink_order_id || response.data?.id || ''),
+          podOrderId: String(orderId),
           status: response.data?.status || 'SUBMITTED',
           trackingNumber: response.data?.tracking_number || '',
           courier: response.data?.courier_name || '',

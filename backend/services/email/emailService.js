@@ -83,17 +83,46 @@ class EmailService {
     return this.sendEmail({ to: email, subject, html });
   }
 
-  async sendPasswordReset(email, resetUrl) {
-    const subject = `Password Reset Request`;
+  async sendPasswordReset(email, resetUrl, name) {
+    const subject = `Reset your GT Clothing Hub password`;
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Password Reset</h2>
-        <p>You requested a password reset. Click the button below to set a new password:</p>
-        <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0;">Reset Password</a>
-        <p>This link is valid for 1 hour.</p>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #FAF8F3; border: 1px solid #E5E2DC; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #6F7358; text-transform: uppercase;">GT CLOTHING HUB • ACCOUNT SECURITY</span>
+          <h1 style="color: #111111; font-size: 24px; font-weight: 800; text-transform: uppercase; margin: 12px 0 6px 0; letter-spacing: -0.5px;">Password Reset Request</h1>
+          <p style="color: #666666; font-size: 14px; margin: 0;">Hi ${name || 'Customer'}, we received a request to reset your password.</p>
+        </div>
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E2DC; border-radius: 8px; padding: 24px; text-align: center; margin: 24px 0;">
+          <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-top: 0;">Click the button below to set a new password. For security, this link is single-use and expires in 1 hour.</p>
+          <a href="${resetUrl}" style="display: inline-block; background-color: #111111; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin: 12px 0;">RESET PASSWORD</a>
+          <p style="color: #888888; font-size: 12px; margin-bottom: 0;">If the button does not work, copy and paste this link into your browser:<br/><a href="${resetUrl}" style="color: #6F7358; word-break: break-all;">${resetUrl}</a></p>
+        </div>
+        <p style="color: #999999; font-size: 11px; text-align: center; margin: 0;">If you did not request a password reset, you can safely ignore this email.</p>
       </div>
     `;
-    return this.sendEmail({ to: email, subject, html });
+    const text = `Reset your GT Clothing Hub password: ${resetUrl} (Valid for 1 hour)`;
+    return this.sendEmail({ to: email, subject, html, text });
+  }
+
+  async sendEmailVerification(email, verificationUrl, name) {
+    const subject = `Verify your GT Clothing Hub account`;
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #FAF8F3; border: 1px solid #E5E2DC; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #6F7358; text-transform: uppercase;">GT CLOTHING HUB • AUTHENTIC STREETWEAR</span>
+          <h1 style="color: #111111; font-size: 24px; font-weight: 800; text-transform: uppercase; margin: 12px 0 6px 0; letter-spacing: -0.5px;">Verify Your Email</h1>
+          <p style="color: #666666; font-size: 14px; margin: 0;">Hi ${name || 'Customer'}, please verify your email address to secure your account.</p>
+        </div>
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E2DC; border-radius: 8px; padding: 24px; text-align: center; margin: 24px 0;">
+          <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-top: 0;">Click the button below to complete email verification. This link is single-use and valid for 24 hours.</p>
+          <a href="${verificationUrl}" style="display: inline-block; background-color: #111111; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin: 12px 0;">VERIFY EMAIL ADDRESS</a>
+          <p style="color: #888888; font-size: 12px; margin-bottom: 0;">If the button does not work, copy and paste this link into your browser:<br/><a href="${verificationUrl}" style="color: #6F7358; word-break: break-all;">${verificationUrl}</a></p>
+        </div>
+        <p style="color: #999999; font-size: 11px; text-align: center; margin: 0;">If you did not register for an account, please disregard this email.</p>
+      </div>
+    `;
+    const text = `Verify your GT Clothing Hub email address: ${verificationUrl} (Valid for 24 hours)`;
+    return this.sendEmail({ to: email, subject, html, text });
   }
 
   async sendVerificationOtp(email, otp) {

@@ -12,6 +12,9 @@ const protect = async (req, res, next) => {
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'User not found' });
       }
+      if (req.user.changedPasswordAfter && req.user.changedPasswordAfter(decoded.iat)) {
+        return res.status(401).json({ success: false, message: 'Password recently changed. Please log in again.' });
+      }
       return next();
     } catch (error) {
       return res.status(401).json({ success: false, message: 'Not authorized, token failed' });

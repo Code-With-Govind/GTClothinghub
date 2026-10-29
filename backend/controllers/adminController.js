@@ -111,7 +111,12 @@ exports.updateOrderStatus = async (req, res) => {
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-    if (orderStatus) order.orderStatus = orderStatus;
+    if (orderStatus) {
+      order.orderStatus = orderStatus;
+      if (orderStatus === 'DELIVERED' && !order.deliveredAt) {
+        order.deliveredAt = new Date();
+      }
+    }
     if (paymentStatus) order.paymentStatus = paymentStatus;
     if (trackingNumber) order.trackingNumber = trackingNumber;
     if (courier) order.courier = courier;
@@ -135,6 +140,82 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     res.json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Review and update return request (Admin Approve / Reject)
+// @route   PUT /api/admin/orders/:id/return-request
+// @access  Private/Admin
+exports.updateReturnRequest = async (req, res) => {
+  try {
+    const { status, adminNotes, rejectionReason } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (!['APPROVED', 'REJECTED'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status must be either APPROVED or REJECTED.',
+      });
+    }
+
+    if (order.returnRequest?.status !== 'PENDING') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot update return request with current status: ${order.returnRequest?.status || 'NONE'}`,
+      });
+    }
+
+    const sanitizedNotes = (adminNotes || '').trim().slice(0, 1000);
+    const sanitizedRejection = (rejectionReason || '').trim().slice(0, 1000);
+
+    if (status === 'REJECTED') {
+      if (!sanitizedRejection || sanitizedRejection.length < 10) {
+        return res.status(400).json({
+          success: false,
+          message: 'A detailed rejection reason (minimum 10 characters) is required when declining a return request.',
+        });
+      }
+      order.returnRequest.status = 'REJECTED';
+      order.returnRequest.rejectionReason = sanitizedRejection;
+      order.returnRequest.adminNotes = sanitizedNotes;
+      order.returnRequest.processedAt = new Date();
+      // Revert order status back to DELIVERED as return was declined
+      order.orderStatus = 'DELIVERED';
+    } else if (status === 'APPROVED') {
+      order.returnRequest.status = 'APPROVED';
+      order.returnRequest.adminNotes = sanitizedNotes;
+      order.returnRequest.processedAt = new Date();
+      // Keep order status as RETURN_REQUESTED (goods still with customer; physical verification pending)
+      order.orderStatus = 'RETURN_REQUESTED';
+    }
+
+    await order.save();
+
+    await AdminAuditLog.create({
+      admin: req.user._id,
+      adminEmail: req.user.email,
+      action: 'RETURN_REQUEST_UPDATED',
+      entity: 'Order',
+      entityId: order._id.toString(),
+      metadata: {
+        orderNumber: order.orderNumber,
+        returnStatus: status,
+        rejectionReason: sanitizedRejection,
+        adminNotes: sanitizedNotes,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: status === 'APPROVED' ? 'Return request approved successfully.' : 'Return request declined.',
+      order,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

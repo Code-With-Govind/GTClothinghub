@@ -9,11 +9,15 @@ export default function SEO({ title, description, keywords, image, path, schema 
     const defaultImage = `${BASE_URL}/og-image.jpg`;
     
     // Page Title
-    document.title = title ? `${title} | GT CLOTHING HUB` : defaultTitle;
+    const formattedTitle = title
+      ? (title.includes('GT CLOTHING HUB') ? title : `${title} | GT CLOTHING HUB`)
+      : defaultTitle;
+    document.title = formattedTitle;
 
-    // Canonical Link
-    const currentPath = path || window.location.pathname;
-    const canonicalUrl = `${BASE_URL}${currentPath}`;
+    // Canonical Link & Origin Resolution
+    const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : BASE_URL;
+    const currentPath = path || (typeof window !== 'undefined' ? window.location.pathname : '');
+    const canonicalUrl = `${origin}${currentPath}`;
     
     let canonicalTag = document.querySelector('link[rel="canonical"]');
     if (!canonicalTag) {
@@ -40,7 +44,7 @@ export default function SEO({ title, description, keywords, image, path, schema 
 
     // OpenGraph Meta
     setMeta('property', 'og:site_name', 'GT CLOTHING HUB');
-    setMeta('property', 'og:title', title ? `${title} | GT CLOTHING HUB` : defaultTitle);
+    setMeta('property', 'og:title', formattedTitle);
     setMeta('property', 'og:description', description || defaultDesc);
     setMeta('property', 'og:url', canonicalUrl);
     setMeta('property', 'og:type', schema ? 'product' : 'website');
@@ -48,7 +52,7 @@ export default function SEO({ title, description, keywords, image, path, schema 
 
     // Twitter Cards
     setMeta('name', 'twitter:card', 'summary_large_image');
-    setMeta('name', 'twitter:title', title ? `${title} | GT CLOTHING HUB` : defaultTitle);
+    setMeta('name', 'twitter:title', formattedTitle);
     setMeta('name', 'twitter:description', description || defaultDesc);
     setMeta('name', 'twitter:image', image || defaultImage);
 

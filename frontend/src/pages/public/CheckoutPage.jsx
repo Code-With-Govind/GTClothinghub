@@ -162,7 +162,7 @@ export default function CheckoutPage() {
 
       // 3. Handle Razorpay Online Order
       const razorpayOrder = orderRes.razorpayOrder;
-      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
+      const razorpayKey = orderRes.razorpayKey || import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
 
       if (razorpayOrder?.isMock) {
         if (import.meta.env.DEV) {

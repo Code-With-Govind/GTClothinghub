@@ -30,6 +30,10 @@ export default function RegisterPage() {
     }
   }, [user, navigate]);
 
+  const validateStrongPassword = (pwd) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(pwd);
+  };
+
   const handleRegisterInitial = async (e) => {
     e.preventDefault();
     setError('');
@@ -37,6 +41,11 @@ export default function RegisterPage() {
 
     if (!name || !email || !password) {
       setError('Name, email, and password are required.');
+      return;
+    }
+
+    if (!validateStrongPassword(password)) {
+      setError('Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (e.g. @, #, $, !)');
       return;
     }
 
@@ -180,12 +189,12 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase mb-1.5 font-mono">Password (Min. 6 chars)</label>
+                <label className="block text-xs font-bold text-[#111111] uppercase mb-1.5 font-mono">Password (Min. 8 characters)</label>
                 <div className="relative">
                   <input
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
@@ -193,6 +202,7 @@ export default function RegisterPage() {
                   />
                   <Lock className="w-4 h-4 text-[#666666] absolute left-3.5 top-3.5" />
                 </div>
+                <p className="text-[10px] text-[#666666] font-mono mt-1">Must include uppercase, lowercase, number, and special character.</p>
               </div>
 
               <button

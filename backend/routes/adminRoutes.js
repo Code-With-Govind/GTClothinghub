@@ -4,6 +4,7 @@ const {
   getDashboardStats,
   getAllOrders,
   updateOrderStatus,
+  updateReturnRequest,
   processRefund,
   getAuditLogs,
 } = require('../controllers/adminController');
@@ -14,6 +15,7 @@ router.use(protect, admin);
 router.get('/dashboard', getDashboardStats);
 router.get('/orders', getAllOrders);
 router.put('/orders/:id/status', updateOrderStatus);
+router.put('/orders/:id/return-request', updateReturnRequest);
 router.post('/orders/:id/refund', processRefund);
 router.get('/audit-logs', getAuditLogs);
 

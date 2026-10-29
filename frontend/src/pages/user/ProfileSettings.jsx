@@ -1,15 +1,42 @@
 import React, { useState } from 'react';
-import { User, Phone, Mail, CheckCircle2 } from 'lucide-react';
+import { User, Phone, Mail, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import UserLayout from '../../components/user/UserLayout';
 import { useAuth } from '../../context/AuthContext';
 
 export default function ProfileSettings() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, resendVerification } = useAuth();
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verifyNotice, setVerifyNotice] = useState('');
+  const [verifyCooldown, setVerifyCooldown] = useState(0);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+
+  const handleSendVerification = async () => {
+    if (!user?.email || verifyCooldown > 0) return;
+    setVerifyLoading(true);
+    setVerifyNotice('');
+    try {
+      const res = await resendVerification(user.email);
+      setVerifyNotice(res.message || 'Verification link sent to your email.');
+      setVerifyCooldown(60);
+      const timer = setInterval(() => {
+        setVerifyCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setVerifyNotice(err.message || 'Failed to send verification email.');
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,9 +110,20 @@ export default function ProfileSettings() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#666666] uppercase mb-1.5 font-mono">
-              Email Address (Read-only)
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-[#666666] uppercase font-mono">
+                Email Address (Read-only)
+              </label>
+              {user?.isEmailVerified ? (
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-mono font-bold">
+                  <CheckCircle2 className="w-3 h-3" /> VERIFIED
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-mono font-bold">
+                  UNVERIFIED
+                </span>
+              )}
+            </div>
             <div className="relative">
               <input
                 type="email"
@@ -95,6 +133,29 @@ export default function ProfileSettings() {
               />
               <Mail className="w-4 h-4 text-[#666666] absolute left-3.5 top-3.5" />
             </div>
+
+            {!user?.isEmailVerified && (
+              <div className="mt-2 p-3 bg-amber-50/70 border border-amber-200/80 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="text-[11px] text-amber-800 font-medium">
+                  Your email is not verified yet. Verify to enhance account recovery security.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSendVerification}
+                  disabled={verifyLoading || verifyCooldown > 0}
+                  className="text-xs font-bold font-mono text-[#111111] underline hover:text-[#6F7358] shrink-0"
+                >
+                  {verifyLoading ? 'Sending...' : verifyCooldown > 0 ? `Resend (${verifyCooldown}s)` : 'Send Verification Link'}
+                </button>
+              </div>
+            )}
+
+            {verifyNotice && (
+              <p className="text-[11px] text-[#6F7358] font-medium mt-1.5">
+                {verifyNotice}
+              </p>
+            )}
+
             <p className="text-[10px] text-[#666666] mt-1 font-mono">Contact support if you need to update your registered email.</p>
           </div>
 

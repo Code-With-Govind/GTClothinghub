@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, User, Key, ArrowRight, Truck, ShoppingBag, ChevronRight } from 'lucide-react';
+import { Package, User, Key, ArrowRight, Truck, ShoppingBag, ChevronRight, Mail } from 'lucide-react';
 import SEO from '../../components/common/SEO';
 import UserLayout from '../../components/user/UserLayout';
 import { useAuth } from '../../context/AuthContext';
@@ -37,6 +37,21 @@ export default function MyAccount() {
           <p className="text-xs text-[#666666] mt-1 font-medium">
             Manage your orders, profile and account preferences.
           </p>
+
+          {user && !user.isEmailVerified && (
+            <div className="mt-4 p-3 bg-amber-50/80 border border-amber-200/80 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-amber-900 text-xs">
+                <Mail className="w-4 h-4 text-amber-700 shrink-0" />
+                <span>Your email is not verified yet. Verify your email to ensure password recovery access.</span>
+              </div>
+              <Link
+                to="/account/profile"
+                className="text-xs font-bold text-[#111111] hover:text-[#6F7358] underline font-mono shrink-0"
+              >
+                Verify In Profile &rarr;
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Action Overview Cards */}

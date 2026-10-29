@@ -126,6 +126,7 @@ const orderSchema = new mongoose.Schema(
     courierStatus: { type: String, default: '' },
     deliveryAttempts: { type: Number, default: 0 },
     rtoReason: { type: String, default: '' },
+    deliveredAt: { type: Date, default: null },
     
     // Cancellation / Refund Request
     returnRequest: {
@@ -133,6 +134,23 @@ const orderSchema = new mongoose.Schema(
       details: { type: String, default: '' },
       requestedAt: { type: Date, default: null },
       status: { type: String, enum: ['NONE', 'PENDING', 'APPROVED', 'REJECTED'], default: 'NONE' },
+      isLegacyReview: { type: Boolean, default: false },
+      items: [
+        {
+          orderItemId: { type: String, default: '' },
+          product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+          name: { type: String, default: '' },
+          sku: { type: String, default: '' },
+          color: { type: String, default: '' },
+          size: { type: String, default: '' },
+          image: { type: String, default: '' },
+          unitPrice: { type: Number, default: 0 },
+          quantity: { type: Number, default: 1 },
+          reason: { type: String, default: '' },
+        },
+      ],
+      adminNotes: { type: String, default: '' },
+      rejectionReason: { type: String, default: '' },
       refundAmount: { type: Number, default: 0 },
       refundId: { type: String, default: '' },
       processedAt: { type: Date, default: null },
