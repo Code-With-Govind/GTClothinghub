@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ShoppingBag,
@@ -10,6 +10,8 @@ import {
   Zap,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Package,
   CheckCircle2,
   AlertCircle,
@@ -48,6 +50,7 @@ export default function ProductDetail() {
   const [addedToast, setAddedToast] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [copiedToast, setCopiedToast] = useState(false);
+  const thumbnailsScrollRef = useRef(null);
 
   // Accordion state
   const [openAccordion, setOpenAccordion] = useState('DESCRIPTION');
@@ -136,6 +139,35 @@ export default function ProductDetail() {
   const handleSizeChange = (newSize) => {
     setSelectedSize(newSize);
     setValidationError('');
+  };
+
+  const imagesList = Array.isArray(product?.images) && product.images.length > 0 ? product.images : [];
+
+  const currentImageIndex = imagesList.findIndex((img) => {
+    const url = typeof img === 'string' ? img : img.url;
+    return url === activeImage;
+  });
+
+  const handleNextImage = () => {
+    if (imagesList.length <= 1) return;
+    const nextIdx = (currentImageIndex + 1) % imagesList.length;
+    const nextUrl = typeof imagesList[nextIdx] === 'string' ? imagesList[nextIdx] : imagesList[nextIdx].url;
+    setActiveImage(nextUrl);
+    setImageError(false);
+  };
+
+  const handlePrevImage = () => {
+    if (imagesList.length <= 1) return;
+    const prevIdx = (currentImageIndex - 1 + imagesList.length) % imagesList.length;
+    const prevUrl = typeof imagesList[prevIdx] === 'string' ? imagesList[prevIdx] : imagesList[prevIdx].url;
+    setActiveImage(prevUrl);
+    setImageError(false);
+  };
+
+  const scrollThumbnails = (direction) => {
+    if (!thumbnailsScrollRef.current) return;
+    const amount = direction === 'left' ? -180 : 180;
+    thumbnailsScrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
   };
 
   // Compute active variant details
@@ -318,7 +350,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 bg-[#F7F5F0]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10 bg-[#F7F5F0]">
       <SEO
         title={product.seoTitle || `${product.name} | GT CLOTHING HUB`}
         description={product.seoDescription || product.description}
@@ -335,17 +367,19 @@ export default function ProductDetail() {
       </Link>
 
       {/* Main Product Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* LEFT: Product Gallery */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className="lg:col-span-6 space-y-3">
           {/* Main Hero Image */}
-          <div className="aspect-[4/5] bg-white border border-[#E5E2DC] rounded-2xl relative overflow-hidden shadow-fashion-sm flex items-center justify-center p-4 sm:p-8">
+          <div className="aspect-[4/5] max-h-[440px] sm:max-h-[480px] bg-white border border-[#E5E2DC] rounded-2xl relative overflow-hidden shadow-fashion-sm flex items-center justify-center p-3 sm:p-4 group">
             {activeImage && !imageError ? (
               <img
                 src={activeImage}
                 alt={product.name}
+                onClick={handleNextImage}
                 onError={() => setImageError(true)}
-                className="w-full h-full object-contain object-center transition-all duration-300 select-none"
+                className="w-full h-full object-contain object-center transition-all duration-300 select-none cursor-pointer"
+                title="Click to view next image"
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-center p-8 space-y-3 text-[#666666]">
@@ -359,7 +393,7 @@ export default function ProductDetail() {
 
             {/* Discount Badge */}
             {discountPercent && (
-              <div className="absolute top-4 left-4 z-10">
+              <div className="absolute top-3.5 left-3.5 z-10">
                 <span className="bg-[#111111] text-white font-mono font-bold text-xs px-2.5 py-1 rounded-md shadow-sm">
                   -{discountPercent}% OFF
                 </span>
@@ -367,51 +401,119 @@ export default function ProductDetail() {
             )}
 
             {/* Main Section Badge */}
-            <div className="absolute top-4 right-4 z-10">
+            <div className="absolute top-3.5 right-3.5 z-10">
               <span className="bg-white/90 backdrop-blur-xs text-[#111111] border border-[#E5E2DC] font-mono font-bold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider shadow-xs">
                 {product.mainSection || 'Streetwear'}
               </span>
             </div>
+
+            {/* Prev / Next Image Navigation Arrows */}
+            {imagesList.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrevImage();
+                  }}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-[#111111] border border-[#E5E2DC] shadow-sm flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105 z-10"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNextImage();
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-[#111111] border border-[#E5E2DC] shadow-sm flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105 z-10"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-3 right-3 z-10 pointer-events-none">
+                  <span className="bg-[#111111]/80 backdrop-blur-xs text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    {(currentImageIndex >= 0 ? currentImageIndex : 0) + 1} / {imagesList.length}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Clickable Thumbnails */}
-          {product.images && product.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-              {product.images.map((img, idx) => {
-                const imgUrl = typeof img === 'string' ? img : img.url;
-                const isActive = activeImage === imgUrl;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setActiveImage(imgUrl);
-                      setImageError(false);
-                    }}
-                    className={`w-20 sm:w-24 aspect-[4/5] border rounded-xl transition-all shrink-0 bg-white overflow-hidden p-1.5 flex items-center justify-center ${
-                      isActive
-                        ? 'border-[#111111] ring-2 ring-[#111111] shadow-sm'
-                        : 'border-[#E5E2DC] opacity-70 hover:opacity-100 hover:border-[#888888]'
-                    }`}
-                    aria-label={`View product image ${idx + 1}`}
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={img.altText || `${product.name} view ${idx + 1}`}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  </button>
-                );
-              })}
+          {/* Clickable & Swipeable Thumbnails Slider */}
+          {imagesList.length > 1 && (
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <span className="font-bold uppercase tracking-wider text-[#111111] flex items-center gap-1.5">
+                  <span>AVAILABLE COLORS / VIEWS</span>
+                  <span className="px-1.5 py-0.2 bg-[#111111] text-white text-[10px] rounded font-bold">
+                    {imagesList.length}
+                  </span>
+                </span>
+                <span className="text-[10px] text-[#888888]">Swipe or click &rarr;</span>
+              </div>
+
+              <div className="relative flex items-center">
+                <button
+                  type="button"
+                  onClick={() => scrollThumbnails('left')}
+                  className="shrink-0 p-1.5 rounded-lg border border-[#E5E2DC] bg-white hover:bg-[#F7F5F0] text-[#111111] transition-colors mr-1.5 shadow-xs"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                <div
+                  ref={thumbnailsScrollRef}
+                  className="flex gap-2 overflow-x-auto pb-1 scrollbar-none scroll-smooth snap-x snap-mandatory flex-grow"
+                >
+                  {imagesList.map((img, idx) => {
+                    const imgUrl = typeof img === 'string' ? img : img.url;
+                    const isActive = activeImage === imgUrl;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setActiveImage(imgUrl);
+                          setImageError(false);
+                        }}
+                        className={`w-14 sm:w-16 aspect-[4/5] border rounded-lg transition-all shrink-0 bg-white overflow-hidden p-1 flex items-center justify-center snap-start ${
+                          isActive
+                            ? 'border-[#111111] ring-2 ring-[#111111] shadow-xs'
+                            : 'border-[#E5E2DC] opacity-70 hover:opacity-100 hover:border-[#888888]'
+                        }`}
+                        aria-label={`View option ${idx + 1}`}
+                      >
+                        <img
+                          src={imgUrl}
+                          alt={img.altText || `${product.name} option ${idx + 1}`}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollThumbnails('right')}
+                  className="shrink-0 p-1.5 rounded-lg border border-[#E5E2DC] bg-white hover:bg-[#F7F5F0] text-[#111111] transition-colors ml-1.5 shadow-xs"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           )}
         </div>
 
         {/* RIGHT: Product Information & Controls */}
-        <div className="lg:col-span-5 space-y-6 bg-white border border-[#E5E2DC] rounded-2xl p-6 sm:p-8 shadow-fashion-sm">
+        <div className="lg:col-span-6 space-y-4 bg-white border border-[#E5E2DC] rounded-2xl p-5 sm:p-6 shadow-fashion-sm">
           {/* Header & Title */}
           <div>
             <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -437,13 +539,13 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold uppercase text-[#111111] font-display leading-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold uppercase text-[#111111] font-display leading-tight">
               {product.name}
             </h1>
 
             {/* Rating */}
             {product.numReviews > 0 && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-[#6F7358]">
+              <div className="flex items-center gap-2 mt-1.5 text-xs text-[#6F7358]">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-3.5 h-3.5 fill-current text-[#111111]" />
@@ -456,14 +558,14 @@ export default function ProductDetail() {
           </div>
 
           {/* Pricing & Stock Availability */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-y border-[#E5E2DC] py-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-y border-[#E5E2DC] py-3">
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-extrabold text-[#111111] font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#111111] font-mono">
                 {formatPrice(currentPrice)}
               </span>
               {hasDiscount && (
                 <>
-                  <span className="text-base text-[#666666] line-through font-mono">
+                  <span className="text-sm text-[#666666] line-through font-mono">
                     {formatPrice(currentCompareAtPrice)}
                   </span>
                   <span className="text-xs font-bold text-[#6F7358] bg-[#F7F5F0] border border-[#E5E2DC] px-2 py-0.5 rounded-md font-mono">
@@ -532,11 +634,11 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <button
                 onClick={handleAddToCart}
                 disabled={!isAvailable}
-                className="btn-primary w-full py-4 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full py-3 sm:py-3.5 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {isAvailable ? 'ADD TO CART' : 'CURRENTLY UNAVAILABLE'}
@@ -545,7 +647,7 @@ export default function ProductDetail() {
               <button
                 onClick={handleBuyNow}
                 disabled={!isAvailable}
-                className="btn-outline w-full py-4 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-outline w-full py-3 sm:py-3.5 text-xs font-extrabold tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Zap className="w-4 h-4" /> BUY NOW
               </button>

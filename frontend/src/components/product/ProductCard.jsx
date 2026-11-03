@@ -64,9 +64,10 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="group bg-white rounded-xl border border-[#E5E2DC] hover:border-[#111111] transition-all duration-300 flex flex-col h-full hover:shadow-fashion-md overflow-hidden">
-      {/* Product Image Container (75% visual attention) */}
-      <div
-        className="relative aspect-[3/4] overflow-hidden bg-[#F7F5F0]"
+      {/* Product Image Container (Clicking opens product details page) */}
+      <Link
+        to={`/product/${product.slug}`}
+        className="relative aspect-[3/4] overflow-hidden bg-[#F7F5F0] block cursor-pointer"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -101,13 +102,12 @@ export default function ProductCard({ product }) {
 
         {/* Quick View Button */}
         <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
-          <Link
-            to={`/product/${product.slug}`}
+          <span
             className="w-8 h-8 bg-white/90 hover:bg-white text-[#111111] rounded-full flex items-center justify-center shadow-xs backdrop-blur-xs transition-transform hover:scale-105"
             title="View Details"
           >
             <Eye className="w-3.5 h-3.5" />
-          </Link>
+          </span>
         </div>
 
         {/* Quick Add Overlay Button on Image Hover */}
@@ -121,14 +121,21 @@ export default function ProductCard({ product }) {
             {added ? 'ADDED TO BAG' : 'ADD TO CART'}
           </button>
         </div>
-      </div>
+      </Link>
 
       {/* Product Info */}
       <div className="p-3.5 flex flex-col flex-grow justify-between space-y-2 bg-white text-left">
         <div className="space-y-1">
-          <span className="text-[9px] font-mono font-bold text-[#666666] uppercase tracking-widest block truncate">
-            {product.mainSection || 'GT STREETWEAR'}
-          </span>
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[9px] font-mono font-bold text-[#666666] uppercase tracking-widest block truncate">
+              {product.mainSection || 'GT STREETWEAR'}
+            </span>
+            {product.colors && product.colors.length > 1 && (
+              <span className="text-[9px] font-mono text-[#6F7358] font-bold shrink-0">
+                {product.colors.length} COLORS
+              </span>
+            )}
+          </div>
           <Link to={`/product/${product.slug}`} className="block">
             <h3 className="font-bold text-xs sm:text-sm text-[#111111] hover:text-[#6F7358] transition-colors line-clamp-1 leading-snug uppercase">
               {product.name}

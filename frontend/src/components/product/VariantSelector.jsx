@@ -62,17 +62,23 @@ export default function VariantSelector({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3.5">
       {/* Color Selection */}
       {availableColors.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#666666] font-mono">
-              COLOR: <span className="text-[#111111] font-extrabold">{selectedColor || 'Select a color'}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#666666] font-mono flex items-center gap-2">
+              <span>COLOR:</span>
+              <span className="text-[#111111] font-extrabold">{selectedColor || 'Select a color'}</span>
+              {availableColors.length > 1 && (
+                <span className="text-[10px] font-mono text-[#6F7358] font-bold bg-[#F7F5F0] border border-[#E5E2DC] px-2 py-0.5 rounded-md">
+                  ({availableColors.length} COLORS AVAILABLE)
+                </span>
+              )}
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-thin scroll-smooth">
             {availableColors.map((colorObj, idx) => {
               const isSelected = selectedColor?.toLowerCase() === colorObj.name.toLowerCase();
               return (
@@ -80,20 +86,20 @@ export default function VariantSelector({
                   key={idx}
                   type="button"
                   onClick={() => onSelectColor(colorObj.name)}
-                  className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[42px] border rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] border rounded-lg text-xs font-bold uppercase tracking-wider transition-all shrink-0 ${
                     isSelected
-                      ? 'border-[#111111] bg-[#111111] text-white shadow-sm'
+                      ? 'border-[#111111] bg-[#111111] text-white shadow-xs'
                       : 'border-[#E5E2DC] bg-white text-[#111111] hover:border-[#111111]'
                   }`}
                   aria-pressed={isSelected}
                 >
                   <span
-                    className="w-4 h-4 rounded-full border border-black/20 flex items-center justify-center shrink-0"
+                    className="w-3.5 h-3.5 rounded-full border border-black/20 flex items-center justify-center shrink-0"
                     style={{ backgroundColor: colorObj.hex || '#111111' }}
                   >
-                    {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                    {isSelected && <Check className="w-2 h-2 text-white" />}
                   </span>
-                  <span>{colorObj.name}</span>
+                  <span className="whitespace-nowrap">{colorObj.name}</span>
                 </button>
               );
             })}
@@ -103,7 +109,7 @@ export default function VariantSelector({
 
       {/* Size Selection */}
       {allProductSizes.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-widest text-[#666666] font-mono">
               SIZE: <span className="text-[#111111] font-extrabold">{selectedSize || 'Select a size'}</span>
@@ -120,7 +126,7 @@ export default function VariantSelector({
             )}
           </div>
 
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
             {allProductSizes.map((sz) => {
               const upperSz = sz.toUpperCase();
               const isSelected = selectedSize?.toUpperCase() === upperSz;
@@ -133,7 +139,7 @@ export default function VariantSelector({
                     type="button"
                     disabled
                     title={`${sz} is unavailable in ${selectedColor}`}
-                    className="py-3 min-h-[46px] border border-dashed border-[#E5E2DC] rounded-xl text-xs font-bold uppercase tracking-widest text-[#AAAAAA] bg-[#F7F5F0] cursor-not-allowed line-through opacity-60"
+                    className="py-2 min-h-[38px] border border-dashed border-[#E5E2DC] rounded-lg text-xs font-bold uppercase tracking-widest text-[#AAAAAA] bg-[#F7F5F0] cursor-not-allowed line-through opacity-60"
                   >
                     {sz}
                   </button>
@@ -145,9 +151,9 @@ export default function VariantSelector({
                   key={sz}
                   type="button"
                   onClick={() => onSelectSize(sz)}
-                  className={`py-3 min-h-[46px] border rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all ${
+                  className={`py-2 min-h-[38px] border rounded-lg text-xs font-extrabold uppercase tracking-widest transition-all ${
                     isSelected
-                      ? 'border-[#111111] bg-[#111111] text-white shadow-sm'
+                      ? 'border-[#111111] bg-[#111111] text-white shadow-xs'
                       : 'border-[#E5E2DC] bg-white text-[#111111] hover:border-[#111111]'
                   }`}
                   aria-pressed={isSelected}
