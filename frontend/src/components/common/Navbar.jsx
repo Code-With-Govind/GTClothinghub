@@ -41,11 +41,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Section 09: Announcement Bar */}
-      <div className="w-full bg-[#111111] text-[#F7F5F0] h-[32px] flex items-center justify-center text-[11px] sm:text-[12px] font-mono font-medium uppercase tracking-widest px-4 border-b border-[#222222] select-none z-50">
-        <span>FREE SHIPPING ON ELIGIBLE ORDERS • NEW DROPS EVERY MONTH</span>
-      </div>
-
       {/* Section 06: Minimalist Navbar */}
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
